@@ -4,6 +4,24 @@ M0 reproduces **application PostgreSQL connection pool exhaustion**. It contains
 one FastAPI process, one PostgreSQL database, one read endpoint, and one fault.
 There is no diagnosis logic, AI, worker, or monitoring stack.
 
+## Project index / current checkpoint
+
+- Current milestone: **M0 Completed**. See the authoritative
+  [current state](docs/CURRENT_STATE.md), [M0 decisions](docs/DECISIONS.md),
+  and [verification evidence](VERIFICATION.md). The owner supplied a successful Docker
+  test run: **3 passed in 5.55s**, with pool occupancy, ~1-second structured 503,
+  connection return, and recovery to 200. Overall Project A is not yet complete.
+- Active source: `app/`; database baseline/seed: `db/init.sql`; runtime:
+  `compose.yaml` and `Dockerfile`; dependency baseline: `requirements.lock`.
+- Rerun entry points: `scripts/reproduce_db_pool_exhaustion.py` and
+  `tests/test_integration.py`; commands are below. No separate run artifacts
+  or source snapshots have been created.
+- Learning resume point: read `app/database.py` for session cleanup, then
+  `app/main.py` for the item query, hold, and timeout handler, then follow
+  `scripts/reproduce_db_pool_exhaustion.py` from baseline through recovery.
+- Today's Docker state has not been checked. Keep the existing `.env` when
+  resuming; copying `.env.example` is only needed for first-time setup.
+
 ## Start (PowerShell, Docker Desktop running with Linux containers)
 
 ```powershell
