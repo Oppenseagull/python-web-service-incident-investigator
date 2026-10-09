@@ -16,4 +16,7 @@ dependencies = [
 testpaths = ["tests"]
 pythonpath = ["."]
 addopts = "-ra"
-markers = ["integration: requires the running Docker Compose lab"]
+markers = [
+    "integration: requires the running Docker Compose/PostgreSQL lab",
+    "http_integration: starts real local HTTP processes; does not require PostgreSQL",
+]

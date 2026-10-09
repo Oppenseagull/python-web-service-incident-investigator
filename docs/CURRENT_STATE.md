@@ -3,13 +3,13 @@
 Updated: 2026-10-09. This file is the authoritative progress checkpoint for
 subsequent work on Python Web Service Incident Investigator / Project A.
 
-## Current milestone: M0 Completed
+## Current milestone: M1 / Task 1 implemented — awaiting Owner review
 
-M0's technical spike established a controlled, reproducible PostgreSQL
-application connection pool exhaustion lab. Implementation and the real core
-scenario are complete. Overall Project A is **not complete**. No M1 implementation
-or architecture is approved by this closeout. Personal learning checks do not
-change the completed milestone status or create acceptance blockers.
+M0 remains **Completed**. M1 Task 1 adds a second real fault, six-case catalog,
+and an evidence foundation under the Owner's explicit development instruction.
+This first increment is implemented and verified, then stopped for review.
+Overall Project A and the rest of M1 are **not complete**. Personal learning
+checks do not change completed technical milestone status.
 
 ## Implemented capabilities
 
@@ -28,9 +28,21 @@ change the completed milestone status or create acceptance blockers.
   `DB_POOL_TIMEOUT`; unrelated programming errors remain server errors.
 - Standard request logs carry path, status, request ID, and latency; a pool
   timeout emits a distinct warning. Handled responses carry `X-Request-ID`.
-- One automated scenario polls actual pool occupancy before checking timeout
-  and recovery; two lightweight tests and one real integration test exist.
-- Docker Compose contains only `app` and `postgres`, with initialization SQL,
+- The DB scenario still polls actual pool occupancy and now emits shared
+  evidence records with optional export.
+- `/downstream/value` uses a process-lifetime httpx client for real HTTP IO.
+  ReadTimeout returns structured 504 `DOWNSTREAM_HTTP_TIMEOUT`; other HTTP
+  connection/transport/status errors have distinct 502 handling.
+- A minimal independent `downstream/` process offers `/value`, bounded
+  response-delay injection with TTL/reset, and read-only receipt/fault state.
+  Lab mutation/diagnostic endpoints require the explicit flag in that process.
+- Both fault types emit request IDs, UTC timestamps, dependency, error, latency
+  and observations. Controllers assign run IDs; app incident IDs remain null.
+- [Catalog](INCIDENT_CASE_CATALOG.md): two Implemented, four Proposed cases.
+  [Contract](EVIDENCE_CONTRACT.md): schema and unavailable data.
+- Tests: seven lightweight cases, one independently spawned real HTTP test,
+  one Compose/PostgreSQL integration test (nine total).
+- Docker Compose contains `app`, `postgres`, and `downstream`, with initialization SQL,
   health checks, localhost app binding, and a persistent PostgreSQL volume.
 
 ## Verified technical behavior
@@ -49,16 +61,32 @@ The owner supplied the complete test terminal excerpt retained in
 5. `docker compose exec -e RUN_INTEGRATION=1 app python -m pytest -q -s`
    reports **3 passed in 5.55s**.
 
-This is retained user-provided evidence, not a new closeout execution. Initial
+The M0 result above is retained user-provided evidence. Initial
 Docker failures remain historical. No raw build/application-log export or exact
 successful execution date was retained; the successful excerpt and owner
-confirmation are sufficient to close this spike. Today's runtime availability
-was not checked and is not an unresolved M0 acceptance task.
+confirmation closed that spike. This history remains distinct from the new
+M1 execution below.
+
+New M1 Task 1 execution on 2026-10-09:
+
+- Native TCP + lightweight suite: **8 passed, 1 deselected in 6.21s**.
+- Compose full suite: **9 passed in 9.51s**, including current DB scenario and
+  independent real HTTP timeout/recovery. DB regression returned a ~1003.55ms
+  503 and recovered, checking the shared logging/export changes.
+- Standalone script against Compose app/downstream: **200 → 504 → 200**;
+  timeout **1006.09ms**, correlated dependency request ID, unchanged DB pool
+  (`checked_out=0`, `checked_in=2`). Delayed work and fault state cleared.
+- Docker initially unavailable, later responded after the Owner's launch;
+  a build succeeded after retrying PyPI TLS/network errors. Later metadata
+  resolution hit Docker Hub auth EOF. The final test-only change was copied
+  into the already-built app before testing. No global Docker settings changed.
+
+Source identity, raw/exported evidence: [run index](../artifacts/runs/2026-10-09/README.md).
 
 ## Code baseline and entry points
 
-Implementation baseline: Git commit `1a85657` (`Implement M0 PostgreSQL pool
-exhaustion fault lab`). This closeout changes documents only.
+M0 implementation baseline: Git commit `1a85657`; M0 closeout: `aab5cba`.
+M1 Task 1 source and evidence are committed together after verification.
 
 | Location | Purpose |
 | --- | --- |
@@ -66,9 +94,13 @@ exhaustion fault lab`). This closeout changes documents only.
 | [app/database.py](../app/database.py) | Engine pool and request-scoped session cleanup |
 | [app/config.py](../app/config.py) | Environment settings and connection URL |
 | [app/logging.json](../app/logging.json) | Standard logging configuration |
+| [app/downstream.py](../app/downstream.py), [downstream/main.py](../downstream/main.py) | Real HTTP caller and controlled dependency |
+| [app/evidence.py](../app/evidence.py) | Shared observation model |
 | [scripts/reproduce_db_pool_exhaustion.py](../scripts/reproduce_db_pool_exhaustion.py) | Standalone reproduction and shared integration scenario |
 | [tests/test_lightweight.py](../tests/test_lightweight.py) | Database-independent behavior and programming error checks |
 | [tests/test_integration.py](../tests/test_integration.py) | Real HTTP/PostgreSQL scenario, enabled by `RUN_INTEGRATION=1` |
+| [scripts/reproduce_downstream_timeout.py](../scripts/reproduce_downstream_timeout.py) | Second-fault controller/export |
+| [tests/test_downstream_integration.py](../tests/test_downstream_integration.py), [tests/test_evidence_and_downstream.py](../tests/test_evidence_and_downstream.py) | Real TCP lifecycle/correlation, injection bounds and error discrimination |
 | [db/init.sql](../db/init.sql) | Minimal schema and seed baseline |
 | [compose.yaml](../compose.yaml), [Dockerfile](../Dockerfile) | Local runtime; one app worker |
 | [requirements.lock](../requirements.lock), [pyproject.toml](../pyproject.toml) | Pinned dependencies and direct dependency declarations |
@@ -79,18 +111,20 @@ Optional rerun entry points, when needed for later work (not new M0 gates):
 ```powershell
 docker compose up --build --wait
 docker compose exec app python scripts/reproduce_db_pool_exhaustion.py
+docker compose exec app python scripts/reproduce_downstream_timeout.py
 docker compose exec -e RUN_INTEGRATION=1 app python -m pytest -q -s
 ```
 
 Keep the existing ignored `.env`; `.env.example` is a first-setup reference.
 Active code stays in `app/`, the seed baseline in `db/`, and project state in
-`docs/`. No duplicate source snapshot or additional generated run directory
-was created for closeout; the existing terminal evidence is retained centrally.
+`docs/`. Versioned M1 evidence is in `artifacts/runs/2026-10-09/`, separated
+from active code and historical M0 evidence in `VERIFICATION.md`.
 
 ## Known technical limits
 
-- Exactly one fault and one read path. Reproduction requires an idle, dedicated
-  instance with size 2, overflow 0, timeout 1; the script rejects other settings.
+- Two implemented faults; four other cases are design only. Scripts require
+  idle dedicated instances; DB requires size 2/overflow 0/timeout 1, and HTTP
+  requires read timeout 1 second.
 - One worker/instance: pools and diagnostic statistics are process-local.
   This does not exhaust PostgreSQL's server-wide connection limit.
 - Occupancy must be confirmed within two seconds; holds last five seconds.
@@ -104,18 +138,26 @@ was created for closeout; the existing terminal evidence is retained centrally.
 - Request IDs/logs provide minimal evidence, not distributed tracing, metrics,
   or a durable incident/evidence store. The closeout does not claim production
   readiness or broader performance/cancellation coverage.
+- Downstream state is process-local. ReadTimeout does not cancel its work;
+  reset affects future arrivals and the script drains in-flight work. A TTL
+  bounds abandoned injections. HTTP read budget is not an overall deadline.
+- DB holder identities/wait events and DNS/TLS phase timing are unavailable.
+  Controller case labels and injector state expose ground truth; future blind
+  evaluation must separate them from visible operational evidence. Simple
+  conditions distinguish these two cases; Agent necessity is not established.
 
 ## System capabilities not yet implemented
 
 Agent/LLM integration, incident diagnosis, Incident Persistence, a general
-Eval Runner, additional fault scenarios, evidence ingestion/correlation,
+Eval Runner, four Proposed fault scenarios, automatic evidence ingestion/correlation,
 workers/queues, distributed tracing/metrics infrastructure, and a frontend
 are not implemented. The M0 scenario script is not a general evaluation system.
 
 ## Questions for the next phase
 
-Await the next development instruction. The next phase must define its concrete
-user-facing outcome and acceptance criteria, what evidence it consumes from
-M0, whether any evidence persistence or evaluation is needed, and the smallest
-implementation boundary. These are open design questions, not an approved M1
-feature list or technology architecture. Project Master Context is unchanged.
+Await Owner review. Suggested next increment: separate ground-truth/controller
+metadata from diagnosis-visible evidence, and define a small deterministic
+diagnosis baseline for the implemented cases plus ambiguous/incomplete evidence.
+PostgreSQL lock wait is a useful later confounder, not approved for development
+here. Persistence, evaluation architecture and Agent remain undecided.
+Project Master Context is unchanged.

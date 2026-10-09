@@ -3,6 +3,7 @@ WORKDIR /service
 COPY requirements.lock ./
 RUN pip install --no-cache-dir -r requirements.lock
 COPY app ./app
+COPY downstream ./downstream
 COPY scripts ./scripts
 COPY tests ./tests
 COPY pyproject.toml ./

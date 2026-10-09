@@ -1,4 +1,4 @@
-from pydantic import Field, SecretStr
+from pydantic import Field, HttpUrl, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from sqlalchemy import URL
 
@@ -16,6 +16,8 @@ class Settings(BaseSettings):
     db_pool_size: int = Field(default=2, ge=1)
     db_max_overflow: int = Field(default=0, ge=0)
     db_pool_timeout: float = Field(default=1, gt=0, allow_inf_nan=False)
+    downstream_base_url: HttpUrl = HttpUrl("http://127.0.0.1:8001")
+    downstream_read_timeout: float = Field(default=1, gt=0, le=10, allow_inf_nan=False)
 
     @property
     def database_url(self) -> URL:

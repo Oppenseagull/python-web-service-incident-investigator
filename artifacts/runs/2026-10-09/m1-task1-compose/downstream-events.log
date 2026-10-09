@@ -1,0 +1,6 @@
+2026-10-09 09:27:04,969 INFO controlled_http dependency_received request_id=f2141412d5cb4b929a5c0f45818e84cc applied_delay_seconds=0.0
+2026-10-09 09:27:04,969 INFO controlled_http dependency_finished request_id=f2141412d5cb4b929a5c0f45818e84cc latency_ms=0.08
+2026-10-09 09:27:04,977 INFO controlled_http dependency_received request_id=b8b0f50537704139a66f699257055eb3 applied_delay_seconds=3.0
+2026-10-09 09:27:07,978 INFO controlled_http dependency_finished request_id=b8b0f50537704139a66f699257055eb3 latency_ms=3001.06
+2026-10-09 09:27:08,008 INFO controlled_http dependency_received request_id=c5a0c485ff8b42399b489b31270d41b8 applied_delay_seconds=0.0
+2026-10-09 09:27:08,008 INFO controlled_http dependency_finished request_id=c5a0c485ff8b42399b489b31270d41b8 latency_ms=0.18

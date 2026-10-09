@@ -1,5 +1,40 @@
 # M0 verification
 
+## M1 Task 1 verification — 2026-10-09
+
+M0 remains Completed. The new increment is implemented and awaiting Owner review.
+These are newly executed results, separate from the owner's earlier M0 evidence.
+
+- Native run: `.\.venv\Scripts\python -m pytest -q -s -m 'not integration'`
+  with `LAB_RUN_DIR` set to the dated local run folder: **8 passed, 1 deselected
+  in 6.21s**. Real TCP subprocesses reproduce HTTP timeout/recovery; core timeout
+  is not mocked. Additional tests cover lab flags, delay/TTL bounds and expiration,
+  non-read HTTP error discrimination, and unknown evidence fields/latency validation.
+- Compose: `docker compose exec -T -e RUN_INTEGRATION=1 app python -m pytest -q -s`:
+  **9 passed in 9.51s**. Includes normal/missing DB items, real pool exhaustion
+  and recovery, shared DB evidence record validation, and real HTTP scenario.
+  DB regression measured 1003.55ms to structured 503 and ended at pool state 0/2.
+- Standalone second-fault script against actual Compose services:
+  `docker compose exec -T app python scripts/reproduce_downstream_timeout.py --output /tmp/downstream-scenario.json`:
+  **PASS**, normal 200 → structured 504 after **1006.09ms** → recovery 200.
+  Ground truth: armed 3s downstream response delay; 1s app read timeout. The
+  matching request ID was observed at the downstream with one request still
+  active when the app timed out. DB pool stayed `checked_out=0`, `checked_in=2`.
+  Reset and request drain completed before the recovered request.
+- Fault request ID: `b8b0f50537704139a66f699257055eb3`; app evidence logs preserve
+  `ReadTimeout`, dependency `controlled-http`, and actual client-call duration.
+- Compose config validation passed; services were healthy. Docker initially
+  lacked an engine pipe but subsequently responded with version 29.7.2. A
+  successful build/start followed a transient PyPI TLS failure. Later rebuilds
+  encountered Docker Hub auth EOF, so final test-only assertions were copied
+  into the running app. Source hashes confirm tested code matches the workspace.
+
+[Run index and retained raw/exported evidence](artifacts/runs/2026-10-09/README.md)
+include provenance and the failed later build attempt. No new dependencies were
+added. Current image rebuild may require working Docker Hub connectivity; this
+is an environment limitation, not an unverified core HTTP/DB scenario.
+No proposed catalog fault, Agent, persistence service or general Eval Runner was built.
+
 ## Final M0 verification — M0 Completed
 
 Formally archived on 2026-10-09 from the owner's previously supplied terminal output.

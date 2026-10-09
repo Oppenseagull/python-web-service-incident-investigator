@@ -1,0 +1,4 @@
+NAME               IMAGE                  COMMAND                  SERVICE      CREATED         STATUS                   PORTS
+job-app-1          job-app                "uvicorn app.main:cr…"   app          4 minutes ago   Up 4 minutes (healthy)   127.0.0.1:8000->8000/tcp
+job-downstream-1   job-downstream         "uvicorn downstream.…"   downstream   4 minutes ago   Up 4 minutes (healthy)   127.0.0.1:8001->8001/tcp
+job-postgres-1     postgres:16-bookworm   "docker-entrypoint.s…"   postgres     8 days ago      Up 4 minutes (healthy)   5432/tcp

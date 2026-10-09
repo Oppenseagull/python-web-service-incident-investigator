@@ -3,6 +3,9 @@
 Archived: 2026-10-09. These decisions describe the implemented M0 baseline.
 They do not freeze M1 architecture or claim later system capabilities.
 
+M0 decisions below are retained as their milestone baseline. The subsequent
+M1 Task 1 decisions at the end extend that baseline under Owner authorization.
+
 ## 1. Controlled Python web service fault lab
 
 - Context: The project needs a small backend failure that can be understood
@@ -85,3 +88,54 @@ They do not freeze M1 architecture or claim later system capabilities.
 - Cost: No durable incident/evidence store, general evaluation runner, migrations,
   or investigation automation exists. Whether and how to add later capabilities
   must be decided in a subsequent phase.
+
+## M1 Task 1 — second controlled dependency
+
+- Context: A second real failure should share the symptom of waiting but need
+  evidence different from application DB pool saturation.
+- Decision: Add one small FastAPI downstream process, reuse existing dependencies
+  and Dockerfile, and issue real requests via a lifespan-scoped httpx client.
+  Delay actual responses for 3s against a 1s read budget; catch ReadTimeout as
+  504. Other HTTP errors keep distinct 502 codes.
+- Reason: Prove a request arrived at the dependency while the DB pool was idle;
+  avoid simulated exceptions and prevent error-class conflation.
+- Cost: Compose now has three services; native tests need two subprocesses.
+  HTTP read timeout is per IO read, not an overall deadline. No retry policy is
+  introduced and this is still a dedicated local lab.
+
+## M1 Task 1 — bounded injection and explicit cleanup
+
+- Context: A client timeout does not imply downstream work stops; an interrupted
+  reproduction must not leave an indefinite fault.
+- Decision: A single-process response-delay setting has a monotonic TTL and
+  explicit reset. Existing requests retain their arrival-time delay snapshot.
+  The script confirms fault state, resets in `finally`, polls request drain,
+  and then checks recovery. Lab endpoints require the flag in each process.
+- Reason: Deterministic readiness, bounded mutation and observable cleanup.
+- Cost: In-memory state and last request receipt apply only to an idle single
+  dependency instance; this control surface is not production monitoring.
+
+## M1 Task 1 — observation contract and ground-truth separation
+
+- Context: Two faults need comparable evidence without a full incident service.
+- Decision: Share a Pydantic evidence model in request JSON logs and both
+  reproduction exports; keep source/event type, UTC timestamp, IDs, dependency,
+  error, duration and case-specific observations. Unknown incident IDs are null
+  in application events; run IDs exist only in controller records.
+- Reason: Preserve provenance and correlate request IDs without inventing
+  timestamps, phase timings or incident persistence.
+- Cost: There is no automatic ingestion/correlation/store. Scenario labels and
+  injector state reveal lab ground truth and cannot be treated as a blind
+  diagnosis result. Snapshots and latencies come from different observation scopes.
+
+## M1 Task 1 — catalog before Agent investment
+
+- Context: A list of distinguishable failures does not itself justify an Agent.
+- Decision: Define six cases with confounders, evidence/tool requirements and
+  diagnosis criteria; implement only DB pool exhaustion and HTTP response delay.
+  Keep four designs Proposed and explicitly discuss deterministic baselines.
+- Reason: Lock/query delay can cause secondary pool symptoms; broad worker stalls
+  can resemble dependency timeouts. Future benefit must be tested against such
+  ambiguity with ground truth hidden.
+- Cost: The current two cases can be distinguished with simple rules. Agent
+  necessity, persistence and general evaluation architecture remain undecided.

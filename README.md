@@ -1,31 +1,37 @@
-# Python Web Service Incident Investigator — M0
+# Python Web Service Incident Investigator
 
-M0 reproduces **application PostgreSQL connection pool exhaustion**. It contains
-one FastAPI process, one PostgreSQL database, one read endpoint, and one fault.
-There is no diagnosis logic, AI, worker, or monitoring stack.
+The lab reproduces **application PostgreSQL connection pool exhaustion** (M0)
+and **downstream HTTP response timeout** (M1 Task 1). Compose runs the app,
+PostgreSQL, and one minimal controlled HTTP dependency. No agent, incident
+persistence service, or monitoring stack is implemented.
 
 ## Project index / current checkpoint
 
-- Current milestone: **M0 Completed**. See the authoritative
+- Current milestone: **M1 Task 1 implemented, awaiting Owner review**;
+  **M0 Completed** remains the baseline. See the authoritative
   [current state](docs/CURRENT_STATE.md), [M0 decisions](docs/DECISIONS.md),
   and [verification evidence](VERIFICATION.md). The owner supplied a successful Docker
   test run: **3 passed in 5.55s**, with pool occupancy, ~1-second structured 503,
-  connection return, and recovery to 200. Overall Project A is not yet complete.
+  connection return, and recovery to 200. New M1 results are in the same evidence
+  document. Overall Project A and the rest of M1 are not complete.
+- [Incident catalog](docs/INCIDENT_CASE_CATALOG.md): six candidates, two implemented.
+  [Evidence contract](docs/EVIDENCE_CONTRACT.md): shared observation schema and limits.
+- Active HTTP dependency: `downstream/`; [versioned run evidence](artifacts/runs/2026-10-09/README.md).
 - Active source: `app/`; database baseline/seed: `db/init.sql`; runtime:
   `compose.yaml` and `Dockerfile`; dependency baseline: `requirements.lock`.
 - Rerun entry points: `scripts/reproduce_db_pool_exhaustion.py` and
-  `tests/test_integration.py`; commands are below. No separate run artifacts
-  or source snapshots have been created.
+  `scripts/reproduce_downstream_timeout.py`, `tests/test_integration.py`, and
+  `tests/test_downstream_integration.py`; commands are below.
 - Learning resume point: read `app/database.py` for session cleanup, then
   `app/main.py` for the item query, hold, and timeout handler, then follow
   `scripts/reproduce_db_pool_exhaustion.py` from baseline through recovery.
-- Today's Docker state has not been checked. Keep the existing `.env` when
+- Keep the existing `.env` when
   resuming; copying `.env.example` is only needed for first-time setup.
 
 ## Start (PowerShell, Docker Desktop running with Linux containers)
 
 ```powershell
-Copy-Item .env.example .env
+if (-not (Test-Path .env)) { Copy-Item .env.example .env }
 # Edit .env: choose a local POSTGRES_PASSWORD; keep FAULT_LAB_ENABLED=true.
 docker compose up --build --wait
 curl.exe http://127.0.0.1:8000/healthz
@@ -71,10 +77,29 @@ that code and remain server errors; raw exceptions are not returned to clients.
 
 ## Tests
 
+For the second fault against the Compose app and controlled downstream:
+
+```powershell
+curl.exe http://127.0.0.1:8000/downstream/value
+docker compose exec app python scripts/reproduce_downstream_timeout.py
+```
+
+The script checks a normal 200, arms a 3s response delay with a 10s TTL,
+confirms the actual dependency fault state, verifies a ~1s 504 with code
+`DOWNSTREAM_HTTP_TIMEOUT`, resets the delay in `finally`, polls the in-flight
+request count until it drains, and verifies recovery to 200. It also checks
+the propagated request ID and unchanged DB pool. Both processes need the lab
+flag enabled; the default client read timeout is 1 second.
+
+Optional structured export: either script accepts `--output PATH` inside its
+execution environment. For example, write `/tmp/downstream.json` in the app
+container and retrieve it with `docker compose cp` to a dated subdirectory
+under `artifacts/runs/`. Existing milestone evidence is already indexed.
+
 Inside the running stack (no host Python required):
 
 ```powershell
-docker compose exec app python -m pytest -m "not integration" -q
+docker compose exec app python -m pytest -m "not integration and not http_integration" -q
 docker compose exec -e RUN_INTEGRATION=1 app python -m pytest -q -s
 ```
 
@@ -98,7 +123,19 @@ Without `RUN_INTEGRATION=1`, the database test is explicitly skipped. Dependenci
 are pinned in `requirements.lock`; `pyproject.toml` records direct dependency
 ranges. Uvicorn is the ASGI server; the remaining dependencies are limited to
 the requested stack. Pytest and httpx are included in the lab image so verification
-can run there.
+can run there. `http_integration` starts independent app/dependency subprocesses
+over real TCP using the current Python runtime; it requires no Docker or DB
+and cleans up its processes. PostgreSQL integration is still separately opt-in.
+
+Local HTTP verification with the existing `.venv`:
+
+```powershell
+.\.venv\Scripts\python -m pytest -q -m "not integration"
+```
+
+This runs seven lightweight test cases and one real HTTP test (eight total).
+The core HTTP timeout is never simulated by an ASGI/mock transport; only
+non-core error discrimination tests use httpx MockTransport.
 
 ## Pool configuration and lab boundaries
 
@@ -152,7 +189,23 @@ request never reaches PostgreSQL; the pool cannot lend it a connection.
 - `tests/`: lightweight checks and real integration scenario.
 - `db/init.sql`, `compose.yaml`, `Dockerfile`: seed data and runtime.
 
+HTTP settings: `DOWNSTREAM_BASE_URL` defaults to `http://127.0.0.1:8001` for
+native runs; Compose sets `http://downstream:8001`. `DOWNSTREAM_READ_TIMEOUT=1`
+is configurable but the reproduction requires its default. The process-lifetime
+httpx client has separate connect/write/pool budgets of 2s and no retries or
+environment proxy inheritance. ReadTimeout returns 504; network/connect/httpx
+pool errors return 502 with a distinct code. These defensive handlers do not
+implement additional catalog fault injectors.
+
+Normal HTTP flow: request → middleware/request ID → `/downstream/value`
+→ httpx client → controlled dependency `/value` → JSON → 200 and evidence log.
+Fault flow: dependency delay armed → request actually accepted with forwarded
+ID → dependency waits 3s → app read budget expires after 1s → ReadTimeout
+→ structured 504 and evidence log → reset future delay → wait for original
+request to finish → next request succeeds. The DB session factory is not used.
+
 PostgreSQL initializes the table and seed rows on the first start of its named
 volume. `docker compose down` stops the lab while preserving its data. For a
 deliberate fresh reset, `docker compose down -v` deletes **this lab's database**;
-the next startup recreates it. Stop after M0; no other fault is implemented.
+the next startup recreates it. This increment stops after M1 Task 1; four other
+catalog scenarios remain Proposed and later development awaits Owner review.

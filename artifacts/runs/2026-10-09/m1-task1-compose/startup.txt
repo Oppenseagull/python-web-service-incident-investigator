@@ -1,0 +1,28 @@
+ Image job-downstream Building
+ Image job-app Building
+#1 [internal] load local bake definitions
+#1 reading from stdin 835B done
+#1 DONE 0.0s
+
+#2 [downstream internal] load build definition from Dockerfile
+#2 transferring dockerfile: 478B done
+#2 DONE 0.0s
+
+#3 [app internal] load metadata for docker.io/library/python:3.12-slim
+#3 ERROR: failed to authorize: failed to fetch anonymous token: Get "https://auth.docker.io/token?scope=repository%3Alibrary%2Fpython%3Apull&service=registry.docker.io": EOF
+------
+ > [downstream internal] load metadata for docker.io/library/python:3.12-slim:
+------
+Dockerfile:1
+
+--------------------
+
+   1 | >>> FROM python:3.12-slim
+
+   2 |     WORKDIR /service
+
+   3 |     COPY requirements.lock ./
+
+--------------------
+
+target downstream: failed to solve: failed to fetch anonymous token: Get "https://auth.docker.io/token?scope=repository%3Alibrary%2Fpython%3Apull&service=registry.docker.io": EOF
