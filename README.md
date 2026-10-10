@@ -13,6 +13,10 @@ persistence service, or monitoring stack is implemented.
   development/evaluation environment. Next priority is an Investigation
   Vertical Slice, not completing six fixed fault classes. The Agent, blind
   evidence projection and general Eval Runner are future work, not implemented.
+- [System architecture](docs/ARCHITECTURE.md): current Fault Lab and proposed
+  investigation modules, contracts and trust boundaries.
+  [Development roadmap](docs/ROADMAP.md): Owner review, safe tools, the Agent
+  Vertical Slice, causal cases and Eval; later enhancements remain candidates.
 - Current milestone: **M1 Task 1 implemented, awaiting Owner review**;
   **M0 Completed** remains the baseline. See the authoritative
   [current state](docs/CURRENT_STATE.md), [M0 decisions](docs/DECISIONS.md),
