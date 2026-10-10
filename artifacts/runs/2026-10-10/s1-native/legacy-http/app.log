@@ -1,0 +1,40 @@
+2026-10-10 15:09:31,541 INFO uvicorn.error Started server process [25736]
+2026-10-10 15:09:31,541 INFO uvicorn.error Waiting for application startup.
+2026-10-10 15:09:31,582 INFO uvicorn.error Application startup complete.
+2026-10-10 15:09:31,582 INFO uvicorn.error Uvicorn running on http://127.0.0.1:64511 (Press CTRL+C to quit)
+2026-10-10 15:09:31,705 INFO fault_lab request path=/healthz status=200 request_id=01994ea7451543df817a560a05b1522f latency_ms=0.84
+2026-10-10 15:09:31,705 INFO fault_lab evidence={"schema_version":1,"source":"application","event_type":"http_request","incident_id":null,"scenario_id":null,"request_id":"01994ea7451543df817a560a05b1522f","timestamp":"2026-10-10T07:09:31.705863Z","service":"investigator-app","dependency":null,"error_type":null,"latency_ms":0.84,"observations":{"path":"/healthz","status_code":200}}
+2026-10-10 15:09:31,706 INFO uvicorn.access 127.0.0.1:64520 - "GET /healthz HTTP/1.1" 200
+2026-10-10 15:09:31,733 INFO fault_lab request path=/healthz status=200 request_id=e3308d9c4f5e4c699837254c012091fe latency_ms=0.24
+2026-10-10 15:09:31,733 INFO fault_lab evidence={"schema_version":1,"source":"application","event_type":"http_request","incident_id":null,"scenario_id":null,"request_id":"e3308d9c4f5e4c699837254c012091fe","timestamp":"2026-10-10T07:09:31.733013Z","service":"investigator-app","dependency":null,"error_type":null,"latency_ms":0.24,"observations":{"path":"/healthz","status_code":200}}
+2026-10-10 15:09:31,733 INFO uvicorn.access 127.0.0.1:64523 - "GET /healthz HTTP/1.1" 200
+2026-10-10 15:09:31,746 INFO fault_lab request path=/lab/diagnostics/downstream status=200 request_id=46dda26c476f48fbb61776fc84011d1b latency_ms=1.47
+2026-10-10 15:09:31,746 INFO fault_lab evidence={"schema_version":1,"source":"application","event_type":"http_request","incident_id":null,"scenario_id":null,"request_id":"46dda26c476f48fbb61776fc84011d1b","timestamp":"2026-10-10T07:09:31.746676Z","service":"investigator-app","dependency":null,"error_type":null,"latency_ms":1.47,"observations":{"path":"/lab/diagnostics/downstream","status_code":200}}
+2026-10-10 15:09:31,746 INFO uvicorn.access 127.0.0.1:64523 - "GET /lab/diagnostics/downstream HTTP/1.1" 200
+2026-10-10 15:09:31,757 INFO fault_lab request path=/lab/diagnostics/db-pool status=200 request_id=8df99344a74c4ceeb56b307dedad6848 latency_ms=0.36
+2026-10-10 15:09:31,757 INFO fault_lab evidence={"schema_version":1,"source":"application","event_type":"http_request","incident_id":null,"scenario_id":null,"request_id":"8df99344a74c4ceeb56b307dedad6848","timestamp":"2026-10-10T07:09:31.757687Z","service":"investigator-app","dependency":null,"error_type":null,"latency_ms":0.36,"observations":{"path":"/lab/diagnostics/db-pool","status_code":200}}
+2026-10-10 15:09:31,757 INFO uvicorn.access 127.0.0.1:64523 - "GET /lab/diagnostics/db-pool HTTP/1.1" 200
+2026-10-10 15:09:31,768 INFO httpx HTTP Request: GET http://127.0.0.1:64510/value "HTTP/1.1 200 OK"
+2026-10-10 15:09:31,771 INFO fault_lab request path=/downstream/value status=200 request_id=f611dff5c4524392948a4e01b674d91f latency_ms=9.58
+2026-10-10 15:09:31,771 INFO fault_lab evidence={"schema_version":1,"source":"application","event_type":"http_request","incident_id":null,"scenario_id":null,"request_id":"f611dff5c4524392948a4e01b674d91f","timestamp":"2026-10-10T07:09:31.771616Z","service":"investigator-app","dependency":"controlled-http","error_type":null,"latency_ms":9.58,"observations":{"path":"/downstream/value","status_code":200,"target_path":"/value","read_timeout_seconds":1.0,"dependency_latency_ms":9.06}}
+2026-10-10 15:09:31,771 INFO uvicorn.access 127.0.0.1:64523 - "GET /downstream/value HTTP/1.1" 200
+2026-10-10 15:09:31,776 INFO fault_lab request path=/lab/diagnostics/db-pool status=200 request_id=e2496f494a524efba29cdb1120fd579b latency_ms=0.22
+2026-10-10 15:09:31,776 INFO fault_lab evidence={"schema_version":1,"source":"application","event_type":"http_request","incident_id":null,"scenario_id":null,"request_id":"e2496f494a524efba29cdb1120fd579b","timestamp":"2026-10-10T07:09:31.776790Z","service":"investigator-app","dependency":null,"error_type":null,"latency_ms":0.22,"observations":{"path":"/lab/diagnostics/db-pool","status_code":200}}
+2026-10-10 15:09:31,776 INFO uvicorn.access 127.0.0.1:64523 - "GET /lab/diagnostics/db-pool HTTP/1.1" 200
+2026-10-10 15:09:32,802 WARNING fault_lab DOWNSTREAM_HTTP_TIMEOUT path=/downstream/value request_id=9fb81f1e98d8452fbdc8987fa0b1249e dependency=controlled-http
+2026-10-10 15:09:32,802 INFO fault_lab request path=/downstream/value status=504 request_id=9fb81f1e98d8452fbdc8987fa0b1249e latency_ms=1007.93
+2026-10-10 15:09:32,802 INFO fault_lab evidence={"schema_version":1,"source":"application","event_type":"http_request","incident_id":null,"scenario_id":"downstream-http-timeout","request_id":"9fb81f1e98d8452fbdc8987fa0b1249e","timestamp":"2026-10-10T07:09:32.802075Z","service":"investigator-app","dependency":"controlled-http","error_type":"DOWNSTREAM_HTTP_TIMEOUT","latency_ms":1007.93,"observations":{"path":"/downstream/value","status_code":504,"target_path":"/value","read_timeout_seconds":1.0,"exception_class":"ReadTimeout","dependency_latency_ms":1007.65}}
+2026-10-10 15:09:32,803 INFO uvicorn.access 127.0.0.1:64523 - "GET /downstream/value HTTP/1.1" 504
+2026-10-10 15:09:32,811 INFO fault_lab request path=/lab/diagnostics/db-pool status=200 request_id=872041222023425099efc8f1cc8a8e89 latency_ms=0.45
+2026-10-10 15:09:32,812 INFO fault_lab evidence={"schema_version":1,"source":"application","event_type":"http_request","incident_id":null,"scenario_id":null,"request_id":"872041222023425099efc8f1cc8a8e89","timestamp":"2026-10-10T07:09:32.812643Z","service":"investigator-app","dependency":null,"error_type":null,"latency_ms":0.45,"observations":{"path":"/lab/diagnostics/db-pool","status_code":200}}
+2026-10-10 15:09:32,812 INFO uvicorn.access 127.0.0.1:64523 - "GET /lab/diagnostics/db-pool HTTP/1.1" 200
+2026-10-10 15:09:32,821 INFO fault_lab request path=/healthz status=200 request_id=f2961b51957e4bbf897b49cf560607c7 latency_ms=0.19
+2026-10-10 15:09:32,821 INFO fault_lab evidence={"schema_version":1,"source":"application","event_type":"http_request","incident_id":null,"scenario_id":null,"request_id":"f2961b51957e4bbf897b49cf560607c7","timestamp":"2026-10-10T07:09:32.821246Z","service":"investigator-app","dependency":null,"error_type":null,"latency_ms":0.19,"observations":{"path":"/healthz","status_code":200}}
+2026-10-10 15:09:32,821 INFO uvicorn.access 127.0.0.1:64523 - "GET /healthz HTTP/1.1" 200
+2026-10-10 15:09:34,822 INFO httpx HTTP Request: GET http://127.0.0.1:64510/value "HTTP/1.1 200 OK"
+2026-10-10 15:09:34,824 INFO fault_lab request path=/downstream/value status=200 request_id=4fa75f1d42d54861a7602c48af95228d latency_ms=8.13
+2026-10-10 15:09:34,824 INFO fault_lab evidence={"schema_version":1,"source":"application","event_type":"http_request","incident_id":null,"scenario_id":null,"request_id":"4fa75f1d42d54861a7602c48af95228d","timestamp":"2026-10-10T07:09:34.824366Z","service":"investigator-app","dependency":"controlled-http","error_type":null,"latency_ms":8.13,"observations":{"path":"/downstream/value","status_code":200,"target_path":"/value","read_timeout_seconds":1.0,"dependency_latency_ms":7.91}}
+2026-10-10 15:09:34,824 INFO uvicorn.access 127.0.0.1:64523 - "GET /downstream/value HTTP/1.1" 200
+2026-10-10 15:09:34,829 INFO fault_lab request path=/lab/diagnostics/db-pool status=200 request_id=dc2ca3a64e7646b1b514d9c3002f3e0a latency_ms=0.20
+2026-10-10 15:09:34,829 INFO fault_lab evidence={"schema_version":1,"source":"application","event_type":"http_request","incident_id":null,"scenario_id":null,"request_id":"dc2ca3a64e7646b1b514d9c3002f3e0a","timestamp":"2026-10-10T07:09:34.829044Z","service":"investigator-app","dependency":null,"error_type":null,"latency_ms":0.2,"observations":{"path":"/lab/diagnostics/db-pool","status_code":200}}
+2026-10-10 15:09:34,829 INFO uvicorn.access 127.0.0.1:64523 - "GET /lab/diagnostics/db-pool HTTP/1.1" 200

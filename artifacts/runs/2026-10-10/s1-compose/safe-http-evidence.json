@@ -1,0 +1,165 @@
+[
+  {
+    "call_id": "5a1647bda18b400b8217850fa41e1c53",
+    "tool_name": "get_recent_app_events",
+    "status": "ok",
+    "observations": [
+      {
+        "evidence_id": "9f9943a3c2524709bb895aa1573ef206",
+        "observed_at": "2026-10-10T07:10:18.756295Z",
+        "service": "investigator-app",
+        "source": "app_request",
+        "request_id": "ad6368f1b20241a9934686a117fa5382",
+        "data": {
+          "path": "/downstream/value",
+          "status_code": 200,
+          "dependency": "controlled-http",
+          "error_type": null,
+          "latency_ms": 2.19,
+          "exception_class": null,
+          "db_pool": null,
+          "target_path": "/value",
+          "read_timeout_seconds": 1.0,
+          "dependency_latency_ms": 2.0,
+          "downstream_status": null
+        }
+      }
+    ],
+    "duration_ms": 0.18330400001786984,
+    "truncated": false,
+    "error_code": null,
+    "missing_fields": [],
+    "limitations": [
+      "process_local_bounded_cache_restart_loses_data",
+      "request_end_timestamps_not_request_start"
+    ]
+  },
+  {
+    "call_id": "b894aadb47d94dbf9963cb946e985668",
+    "tool_name": "get_recent_app_events",
+    "status": "ok",
+    "observations": [
+      {
+        "evidence_id": "e2247acc5bea4de69fae04e108722fe9",
+        "observed_at": "2026-10-10T07:10:19.941215Z",
+        "service": "investigator-app",
+        "source": "app_request",
+        "request_id": "8c554a346d0740af808605828159f8fa",
+        "data": {
+          "path": "/downstream/value",
+          "status_code": 504,
+          "dependency": "controlled-http",
+          "error_type": "DOWNSTREAM_HTTP_TIMEOUT",
+          "latency_ms": 1004.3,
+          "exception_class": "ReadTimeout",
+          "db_pool": null,
+          "target_path": "/value",
+          "read_timeout_seconds": 1.0,
+          "dependency_latency_ms": 1003.27,
+          "downstream_status": null
+        }
+      }
+    ],
+    "duration_ms": 0.101595000018051,
+    "truncated": false,
+    "error_code": null,
+    "missing_fields": [],
+    "limitations": [
+      "process_local_bounded_cache_restart_loses_data",
+      "request_end_timestamps_not_request_start"
+    ]
+  },
+  {
+    "call_id": "0ab2c2907c754c7eb69446169f86fb5d",
+    "tool_name": "get_recent_app_events",
+    "status": "ok",
+    "observations": [
+      {
+        "evidence_id": "c19680e6338a4c8481778dc0386ba463",
+        "observed_at": "2026-10-10T07:10:22.042584Z",
+        "service": "investigator-app",
+        "source": "app_request",
+        "request_id": "98083a4aab084f7ca6802d48334c331d",
+        "data": {
+          "path": "/downstream/value",
+          "status_code": 200,
+          "dependency": "controlled-http",
+          "error_type": null,
+          "latency_ms": 4.3,
+          "exception_class": null,
+          "db_pool": null,
+          "target_path": "/value",
+          "read_timeout_seconds": 1.0,
+          "dependency_latency_ms": 4.11,
+          "downstream_status": null
+        }
+      }
+    ],
+    "duration_ms": 0.06138999998483996,
+    "truncated": false,
+    "error_code": null,
+    "missing_fields": [],
+    "limitations": [
+      "process_local_bounded_cache_restart_loses_data",
+      "request_end_timestamps_not_request_start"
+    ]
+  },
+  {
+    "call_id": "75abac6175894b82b9962635e1f75ac9",
+    "tool_name": "check_downstream_health",
+    "status": "ok",
+    "observations": [
+      {
+        "evidence_id": "1d4936e933b941f4b2fabf2b5c024e69",
+        "observed_at": "2026-10-10T07:10:22.092042Z",
+        "service": "investigator-app",
+        "source": "downstream_health",
+        "data": {
+          "dependency": "controlled-http",
+          "target_path": "/healthz",
+          "status_code": 200,
+          "health_status": "ok",
+          "latency_ms": 1.430067000001145,
+          "read_timeout_seconds": 1.0
+        }
+      }
+    ],
+    "duration_ms": 1.5318949999993947,
+    "truncated": false,
+    "error_code": null,
+    "missing_fields": [],
+    "limitations": [
+      "current_healthz_liveness_does_not_prove_value_path_health",
+      "process_local_bounded_cache_restart_loses_data"
+    ]
+  },
+  {
+    "call_id": "3b433444879545a58fd4485ba5084dcb",
+    "tool_name": "get_db_pool_snapshot",
+    "status": "ok",
+    "observations": [
+      {
+        "evidence_id": "53e3797c11d44c359bca336e6b1c0cbe",
+        "observed_at": "2026-10-10T07:10:22.092236Z",
+        "service": "investigator-app",
+        "source": "db_pool",
+        "data": {
+          "configured_pool_size": 2,
+          "configured_max_overflow": 0,
+          "pool_timeout_seconds": 1.0,
+          "checked_out": 0,
+          "checked_in": 0,
+          "overflow": -2
+        }
+      }
+    ],
+    "duration_ms": 0.08847300000525138,
+    "truncated": false,
+    "error_code": null,
+    "missing_fields": [],
+    "limitations": [
+      "instantaneous_process_pool_not_historical_or_postgres_global",
+      "process_local_bounded_cache_restart_loses_data"
+    ]
+  }
+]

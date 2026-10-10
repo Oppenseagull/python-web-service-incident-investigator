@@ -1,0 +1,80 @@
+2026-10-10 15:09:31,198 INFO uvicorn.error Started server process [8120]
+2026-10-10 15:09:31,198 INFO uvicorn.error Waiting for application startup.
+2026-10-10 15:09:31,199 INFO uvicorn.error Application startup complete.
+2026-10-10 15:09:31,199 INFO uvicorn.error Uvicorn running on http://127.0.0.1:64510 (Press CTRL+C to quit)
+2026-10-10 15:09:31,685 INFO uvicorn.access 127.0.0.1:64519 - "GET /healthz HTTP/1.1" 200
+2026-10-10 15:09:31,741 INFO uvicorn.access 127.0.0.1:64524 - "GET /healthz HTTP/1.1" 200
+2026-10-10 15:09:31,751 INFO uvicorn.access 127.0.0.1:64524 - "GET /lab/diagnostics/state HTTP/1.1" 200
+2026-10-10 15:09:31,768 INFO controlled_http dependency_received request_id=f611dff5c4524392948a4e01b674d91f applied_delay_seconds=0.0
+2026-10-10 15:09:31,768 INFO controlled_http dependency_finished request_id=f611dff5c4524392948a4e01b674d91f latency_ms=0.11
+2026-10-10 15:09:31,768 INFO uvicorn.access 127.0.0.1:64525 - "GET /value HTTP/1.1" 200
+2026-10-10 15:09:31,781 INFO uvicorn.access 127.0.0.1:64524 - "GET /lab/diagnostics/state HTTP/1.1" 200
+2026-10-10 15:09:31,785 INFO uvicorn.access 127.0.0.1:64524 - "POST /lab/faults/response-delay HTTP/1.1" 200
+2026-10-10 15:09:31,785 INFO uvicorn.access 127.0.0.1:64524 - "GET /lab/diagnostics/state HTTP/1.1" 200
+2026-10-10 15:09:31,785 INFO controlled_http dependency_received request_id=9fb81f1e98d8452fbdc8987fa0b1249e applied_delay_seconds=3.0
+2026-10-10 15:09:32,816 INFO uvicorn.access 127.0.0.1:64524 - "GET /lab/diagnostics/state HTTP/1.1" 200
+2026-10-10 15:09:32,825 INFO uvicorn.access 127.0.0.1:64524 - "DELETE /lab/faults/response-delay HTTP/1.1" 200
+2026-10-10 15:09:32,830 INFO uvicorn.access 127.0.0.1:64524 - "GET /lab/diagnostics/state HTTP/1.1" 200
+2026-10-10 15:09:32,866 INFO uvicorn.access 127.0.0.1:64524 - "GET /lab/diagnostics/state HTTP/1.1" 200
+2026-10-10 15:09:32,903 INFO uvicorn.access 127.0.0.1:64524 - "GET /lab/diagnostics/state HTTP/1.1" 200
+2026-10-10 15:09:32,933 INFO uvicorn.access 127.0.0.1:64524 - "GET /lab/diagnostics/state HTTP/1.1" 200
+2026-10-10 15:09:32,972 INFO uvicorn.access 127.0.0.1:64524 - "GET /lab/diagnostics/state HTTP/1.1" 200
+2026-10-10 15:09:33,005 INFO uvicorn.access 127.0.0.1:64524 - "GET /lab/diagnostics/state HTTP/1.1" 200
+2026-10-10 15:09:33,036 INFO uvicorn.access 127.0.0.1:64524 - "GET /lab/diagnostics/state HTTP/1.1" 200
+2026-10-10 15:09:33,065 INFO uvicorn.access 127.0.0.1:64524 - "GET /lab/diagnostics/state HTTP/1.1" 200
+2026-10-10 15:09:33,097 INFO uvicorn.access 127.0.0.1:64524 - "GET /lab/diagnostics/state HTTP/1.1" 200
+2026-10-10 15:09:33,128 INFO uvicorn.access 127.0.0.1:64524 - "GET /lab/diagnostics/state HTTP/1.1" 200
+2026-10-10 15:09:33,159 INFO uvicorn.access 127.0.0.1:64524 - "GET /lab/diagnostics/state HTTP/1.1" 200
+2026-10-10 15:09:33,190 INFO uvicorn.access 127.0.0.1:64524 - "GET /lab/diagnostics/state HTTP/1.1" 200
+2026-10-10 15:09:33,221 INFO uvicorn.access 127.0.0.1:64524 - "GET /lab/diagnostics/state HTTP/1.1" 200
+2026-10-10 15:09:33,252 INFO uvicorn.access 127.0.0.1:64524 - "GET /lab/diagnostics/state HTTP/1.1" 200
+2026-10-10 15:09:33,283 INFO uvicorn.access 127.0.0.1:64524 - "GET /lab/diagnostics/state HTTP/1.1" 200
+2026-10-10 15:09:33,320 INFO uvicorn.access 127.0.0.1:64524 - "GET /lab/diagnostics/state HTTP/1.1" 200
+2026-10-10 15:09:33,351 INFO uvicorn.access 127.0.0.1:64524 - "GET /lab/diagnostics/state HTTP/1.1" 200
+2026-10-10 15:09:33,381 INFO uvicorn.access 127.0.0.1:64524 - "GET /lab/diagnostics/state HTTP/1.1" 200
+2026-10-10 15:09:33,413 INFO uvicorn.access 127.0.0.1:64524 - "GET /lab/diagnostics/state HTTP/1.1" 200
+2026-10-10 15:09:33,452 INFO uvicorn.access 127.0.0.1:64524 - "GET /lab/diagnostics/state HTTP/1.1" 200
+2026-10-10 15:09:33,486 INFO uvicorn.access 127.0.0.1:64524 - "GET /lab/diagnostics/state HTTP/1.1" 200
+2026-10-10 15:09:33,519 INFO uvicorn.access 127.0.0.1:64524 - "GET /lab/diagnostics/state HTTP/1.1" 200
+2026-10-10 15:09:33,550 INFO uvicorn.access 127.0.0.1:64524 - "GET /lab/diagnostics/state HTTP/1.1" 200
+2026-10-10 15:09:33,583 INFO uvicorn.access 127.0.0.1:64524 - "GET /lab/diagnostics/state HTTP/1.1" 200
+2026-10-10 15:09:33,613 INFO uvicorn.access 127.0.0.1:64524 - "GET /lab/diagnostics/state HTTP/1.1" 200
+2026-10-10 15:09:33,645 INFO uvicorn.access 127.0.0.1:64524 - "GET /lab/diagnostics/state HTTP/1.1" 200
+2026-10-10 15:09:33,685 INFO uvicorn.access 127.0.0.1:64524 - "GET /lab/diagnostics/state HTTP/1.1" 200
+2026-10-10 15:09:33,716 INFO uvicorn.access 127.0.0.1:64524 - "GET /lab/diagnostics/state HTTP/1.1" 200
+2026-10-10 15:09:33,752 INFO uvicorn.access 127.0.0.1:64524 - "GET /lab/diagnostics/state HTTP/1.1" 200
+2026-10-10 15:09:33,783 INFO uvicorn.access 127.0.0.1:64524 - "GET /lab/diagnostics/state HTTP/1.1" 200
+2026-10-10 15:09:33,826 INFO uvicorn.access 127.0.0.1:64524 - "GET /lab/diagnostics/state HTTP/1.1" 200
+2026-10-10 15:09:33,865 INFO uvicorn.access 127.0.0.1:64524 - "GET /lab/diagnostics/state HTTP/1.1" 200
+2026-10-10 15:09:33,896 INFO uvicorn.access 127.0.0.1:64524 - "GET /lab/diagnostics/state HTTP/1.1" 200
+2026-10-10 15:09:33,937 INFO uvicorn.access 127.0.0.1:64524 - "GET /lab/diagnostics/state HTTP/1.1" 200
+2026-10-10 15:09:33,975 INFO uvicorn.access 127.0.0.1:64524 - "GET /lab/diagnostics/state HTTP/1.1" 200
+2026-10-10 15:09:34,008 INFO uvicorn.access 127.0.0.1:64524 - "GET /lab/diagnostics/state HTTP/1.1" 200
+2026-10-10 15:09:34,039 INFO uvicorn.access 127.0.0.1:64524 - "GET /lab/diagnostics/state HTTP/1.1" 200
+2026-10-10 15:09:34,066 INFO uvicorn.access 127.0.0.1:64524 - "GET /lab/diagnostics/state HTTP/1.1" 200
+2026-10-10 15:09:34,099 INFO uvicorn.access 127.0.0.1:64524 - "GET /lab/diagnostics/state HTTP/1.1" 200
+2026-10-10 15:09:34,141 INFO uvicorn.access 127.0.0.1:64524 - "GET /lab/diagnostics/state HTTP/1.1" 200
+2026-10-10 15:09:34,185 INFO uvicorn.access 127.0.0.1:64524 - "GET /lab/diagnostics/state HTTP/1.1" 200
+2026-10-10 15:09:34,226 INFO uvicorn.access 127.0.0.1:64524 - "GET /lab/diagnostics/state HTTP/1.1" 200
+2026-10-10 15:09:34,256 INFO uvicorn.access 127.0.0.1:64524 - "GET /lab/diagnostics/state HTTP/1.1" 200
+2026-10-10 15:09:34,290 INFO uvicorn.access 127.0.0.1:64524 - "GET /lab/diagnostics/state HTTP/1.1" 200
+2026-10-10 15:09:34,322 INFO uvicorn.access 127.0.0.1:64524 - "GET /lab/diagnostics/state HTTP/1.1" 200
+2026-10-10 15:09:34,355 INFO uvicorn.access 127.0.0.1:64524 - "GET /lab/diagnostics/state HTTP/1.1" 200
+2026-10-10 15:09:34,400 INFO uvicorn.access 127.0.0.1:64524 - "GET /lab/diagnostics/state HTTP/1.1" 200
+2026-10-10 15:09:34,439 INFO uvicorn.access 127.0.0.1:64524 - "GET /lab/diagnostics/state HTTP/1.1" 200
+2026-10-10 15:09:34,471 INFO uvicorn.access 127.0.0.1:64524 - "GET /lab/diagnostics/state HTTP/1.1" 200
+2026-10-10 15:09:34,504 INFO uvicorn.access 127.0.0.1:64524 - "GET /lab/diagnostics/state HTTP/1.1" 200
+2026-10-10 15:09:34,536 INFO uvicorn.access 127.0.0.1:64524 - "GET /lab/diagnostics/state HTTP/1.1" 200
+2026-10-10 15:09:34,569 INFO uvicorn.access 127.0.0.1:64524 - "GET /lab/diagnostics/state HTTP/1.1" 200
+2026-10-10 15:09:34,603 INFO uvicorn.access 127.0.0.1:64524 - "GET /lab/diagnostics/state HTTP/1.1" 200
+2026-10-10 15:09:34,636 INFO uvicorn.access 127.0.0.1:64524 - "GET /lab/diagnostics/state HTTP/1.1" 200
+2026-10-10 15:09:34,670 INFO uvicorn.access 127.0.0.1:64524 - "GET /lab/diagnostics/state HTTP/1.1" 200
+2026-10-10 15:09:34,709 INFO uvicorn.access 127.0.0.1:64524 - "GET /lab/diagnostics/state HTTP/1.1" 200
+2026-10-10 15:09:34,738 INFO uvicorn.access 127.0.0.1:64524 - "GET /lab/diagnostics/state HTTP/1.1" 200
+2026-10-10 15:09:34,776 INFO uvicorn.access 127.0.0.1:64524 - "GET /lab/diagnostics/state HTTP/1.1" 200
+2026-10-10 15:09:34,800 INFO controlled_http dependency_finished request_id=9fb81f1e98d8452fbdc8987fa0b1249e latency_ms=3002.82
+2026-10-10 15:09:34,808 INFO uvicorn.access 127.0.0.1:64524 - "GET /lab/diagnostics/state HTTP/1.1" 200
+2026-10-10 15:09:34,821 INFO controlled_http dependency_received request_id=4fa75f1d42d54861a7602c48af95228d applied_delay_seconds=0.0
+2026-10-10 15:09:34,821 INFO controlled_http dependency_finished request_id=4fa75f1d42d54861a7602c48af95228d latency_ms=0.09
+2026-10-10 15:09:34,822 INFO uvicorn.access 127.0.0.1:64531 - "GET /value HTTP/1.1" 200
+2026-10-10 15:09:34,833 INFO uvicorn.access 127.0.0.1:64524 - "GET /lab/diagnostics/state HTTP/1.1" 200

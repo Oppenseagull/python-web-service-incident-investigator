@@ -11,13 +11,14 @@ persistence service, or monitoring stack is implemented.
   **Adaptive Root-Cause Investigation** from unknown-root-cause symptoms through
   controlled read-only tools to evidence-cited reports. Fault Lab is the
   development/evaluation environment. Next priority is an Investigation
-  Vertical Slice, not completing six fixed fault classes. The Agent, blind
-  evidence projection and general Eval Runner are future work, not implemented.
+  Vertical Slice, not completing six fixed fault classes. S1 now supplies a safe
+  projected tool view; the Agent and general Eval Runner remain unimplemented.
 - [System architecture](docs/ARCHITECTURE.md): current Fault Lab and proposed
   investigation modules, contracts and trust boundaries.
   [Development roadmap](docs/ROADMAP.md): Owner review, safe tools, the Agent
   Vertical Slice, causal cases and Eval; later enhancements remain candidates.
-- Current milestone: **M1 Task 1 implemented, awaiting Owner review**;
+- Current milestone: **S1 implemented and verified, awaiting Owner review**.
+  M1 Task 1 Owner review remains pending;
   **M0 Completed** remains the baseline. See the authoritative
   [current state](docs/CURRENT_STATE.md), [M0 decisions](docs/DECISIONS.md),
   and [verification evidence](VERIFICATION.md). The owner supplied a successful Docker
@@ -26,6 +27,10 @@ persistence service, or monitoring stack is implemented.
   document. Overall Project A and the rest of M1 are not complete.
 - [Incident catalog](docs/INCIDENT_CASE_CATALOG.md): six candidates, two implemented.
   [Evidence contract](docs/EVIDENCE_CONTRACT.md): shared observation schema and limits.
+- Safe tools: [contracts](app/investigator/contracts.py),
+  [projection/cache](app/investigator/evidence.py), [registry](app/investigator/tools.py).
+  [S1 run evidence](artifacts/runs/2026-10-10/README.md): **45 passed** in Compose,
+  real 503/504 evidence and recovery. These tests are not Agent Eval; S2 has not started.
 - Active HTTP dependency: `downstream/`; [versioned run evidence](artifacts/runs/2026-10-09/README.md).
 - Active source: `app/`; database baseline/seed: `db/init.sql`; runtime:
   `compose.yaml` and `Dockerfile`; dependency baseline: `requirements.lock`.
@@ -37,6 +42,65 @@ persistence service, or monitoring stack is implemented.
   `scripts/reproduce_db_pool_exhaustion.py` from baseline through recovery.
 - Keep the existing `.env` when
   resuming; copying `.env.example` is only needed for first-time setup.
+
+## S1 Python tools and reading entry point
+
+Read `contracts.py` → `evidence.py` → `tools.py`, then the capture/lifespan wiring
+in `app/main.py` and the real TCP tests in `tests/test_investigator_integration.py`.
+The three tools are `get_recent_app_events`, `get_db_pool_snapshot`, and
+`check_downstream_health`; no model or public Investigation API is connected.
+
+Inside the **observed app's active lifespan**, a Python caller can use:
+
+```python
+async def inspect_request(app, request_id):
+    registry = app.state.investigator_tools
+    result = await registry.execute({
+        "tool_name": "get_recent_app_events",
+        "arguments": {"request_id": request_id, "limit": 10},
+    })
+    if result.status == "ok":
+        observation = result.observations[0]
+        assert registry.get_evidence(observation.evidence_id) == observation
+    return result
+```
+
+Creating another app with `docker compose exec ... python` creates a separate
+empty cache/pool; it does not attach to the running Uvicorn app. The integration
+test starts a real server in the same Python process as its Registry to demonstrate
+actual calls. On an idle Compose lab, run that tool demonstration with:
+
+```powershell
+docker compose exec -T -e RUN_INTEGRATION=1 app python -m pytest tests/test_investigator_integration.py -q -s
+```
+
+Event queries require a request ID and/or both aware UTC/offset time bounds,
+at most 300 seconds, and 1–50 results. Unknown tools/extra arguments are rejected
+before execution. Pool and health tools accept empty arguments. Results have
+`ok/error/unavailable`, typed observations, duration, truncation, error codes,
+missing fields and limitations. UUID `request_id` correlates a request; separate
+UUID `evidence_id` refers to a specific retained observation, not a scenario/run.
+
+Only explicitly approved paths and fields (including nested pool fields) enter
+the 2,000-record/600-second cache. All `/lab/*` requests, scenario/run labels,
+controller exports and injector state are excluded. Pool snapshots never borrow
+a connection. The health probe only GETs configured `/healthz`, with no caller URL
+or redirects, 1s IO timeout/4 KiB body cap and a 2s async tool deadline. It reports
+current liveness, not proof of business health or the historical root cause.
+
+The cache uses monotonic expiry and FIFO eviction, short locks without IO, and
+copied results. Restart loses records; each worker has its own cache. Citation
+lookup can return `None` after eviction/expiry; no-result tool queries return
+`unavailable`, unknown measurements stay null. These are contract/data access
+boundaries, not a sandbox or production permission isolation. Raw lab logs and
+controller outputs remain privileged and must not be fed to a future Agent.
+
+For the HTTP failure: ReadTimeout means the caller waited too long for response
+data, not that the dependency died. The caller stopping its wait does not send a
+cancel command to `/value`; that coroutine still finishes its original delay.
+Reset only affects new arrivals, so the controller waits for old work to drain.
+Operational evidence is what was observed; Controller Ground Truth contains
+what the experimenter injected and expects. Tools expose the former, not the latter.
 
 ## Start (PowerShell, Docker Desktop running with Linux containers)
 
@@ -217,5 +281,5 @@ request to finish → next request succeeds. The DB session factory is not used.
 PostgreSQL initializes the table and seed rows on the first start of its named
 volume. `docker compose down` stops the lab while preserving its data. For a
 deliberate fresh reset, `docker compose down -v` deletes **this lab's database**;
-the next startup recreates it. This increment stops after M1 Task 1; four other
-catalog scenarios remain Proposed and later development awaits Owner review.
+the next startup recreates it. This increment stops after S1; four other catalog
+scenarios remain Proposed, S2 is unstarted and further development awaits Owner review.

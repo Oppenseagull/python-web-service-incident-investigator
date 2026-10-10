@@ -30,10 +30,46 @@ flowchart LR
 - `/downstream/value` 通过 httpx 调用真实下游。响应延迟大于 read timeout 时引发结构化 504。
 - 请求 ID、延迟、异常和部分状态进入 Evidence Contract v1；控制器可导出复现观测。
 - 目前只有两种 **Implemented** 故障，另四种 **Proposed**；已经记录 9 个 Compose 测试通过（历史验证，不代表此文件生成时重跑）。
-- **未实现** Agent / Investigation API / Agent Tool Contract / 盲测隔离 / Incident store / general Eval runner / Metrics-Traces 平台 / Worker。
+- S1 已实现三个受控 Python 只读工具、输入/输出 schema、显式安全投影、有界缓存和 evidence ID 引用；M1 Task 1 与 S1 均待 Owner Review，M0 仍 Completed。
+- **未实现** Agent / Investigation API / Incident store / general Eval runner / Metrics-Traces 平台 / Worker；独立进程与生产权限隔离也未实现。
 - 本架构图展示的是 **Fault Lab**，不是已经投入使用的调查系统。
 
-## 3. 目标架构（先做实习 MVP；新增调查模块及增强能力均未实现）
+### 2.1 S1 已实现的工具数据流
+
+```mermaid
+flowchart LR
+    Middleware[Actual application request Evidence] --> Projection[Explicit nested allowlist]
+    Projection --> Cache[Safe memory store: 2000 observations / 600s]
+    Call[Python ToolCall] --> Validate[Closed input schema / fixed registry]
+    Validate --> Cache
+    Validate --> Pool[Public SQLAlchemy pool methods: no checkout]
+    Validate --> Health[Fixed downstream GET /healthz: no redirects]
+    Pool --> Cache
+    Health --> Cache
+    Cache --> Result[Typed ToolResult / stable evidence IDs]
+```
+
+代码入口：[contracts.py](../app/investigator/contracts.py)、
+[evidence.py](../app/investigator/evidence.py)、[tools.py](../app/investigator/tools.py)。
+Registry 在应用 lifespan 内通过 `app.state.investigator_tools` 调用；不发布工具 HTTP API。
+另起 Python 进程无法读取正在运行的应用缓存。
+
+- `ToolCall`：生成或提供 `call_id`、三选一 `tool_name`、工具专属 `arguments`，禁止额外字段。
+- `get_recent_app_events`：request ID 和/或带时区的起止时间，窗口 ≤300s，limit 1–50；按事件结束时间倒序。
+- `get_db_pool_snapshot` / `check_downstream_health`：空参数；不接受 URL、SQL 或控制路径。
+- `ToolResult`：call ID、工具名、`ok/error/unavailable`、类型化 observations、执行耗时、截断、结构化错误码、缺失字段和局限。
+- 每条 observation：稳定 `evidence_id`、来源、观测时间、服务和类型化 data；应用事件另含 `request_id`。request ID 关联请求，evidence ID 引用某次具体观测；controller run/scenario ID 不出现。
+- 观测字段：业务路径、状态、依赖、错误类型、耗时、许可异常枚举、逐字段 pool 状态、read timeout 配置和依赖耗时。未知值为 null；不原样透传 observations 或原始文本。
+- 所有 `/lab/*` 请求、reproduction records、scenario/run 标签、嵌套控制字段及未批准字段均不进入缓存。Raw Evidence v1 日志/Controller 导出仍为原契约；S1 是另一层安全视图。
+- TTL 使用单调时钟，容量 FIFO 淘汰；短锁保护内存操作，锁内无网络 IO。查询记录是副本，快照每次新建 ID；`get_evidence(id)` 仅查安全缓存，过期/淘汰/未知返回 `None`。
+- 2s 协作式 async 截止时间；健康探测每次 IO 1s、响应读取上限 4 KiB、不跟随重定向。网络不可达为 unavailable，超时/异常为 error，错误不泄露原始异常。
+- 池快照是此刻本进程的状态；请求事件中的池观测才对应当时的超时。健康端点的 200 只说明当前存活，不能证明业务路径正常、历史状态或上游根因。
+- 这是契约/访问层隔离，不是 Python 沙箱或生产权限模型；Lab 控制器仍可操作故障，但没有注册为工具。内存不能跨进程、恢复重启数据或追溯启动前日志。Agent 未接入，尚无 Agent Eval。
+
+实际结果：本机 **43 passed, 2 deselected**；Compose **45 passed**，包括两个真实故障的工具观测与全部既有回归。
+参见 [S1 运行证据](../artifacts/runs/2026-10-10/README.md)。
+
+## 3. 目标架构（先做实习 MVP；S1 之外的调查模块及增强能力未实现）
 
 ```mermaid
 flowchart TB
@@ -60,16 +96,16 @@ flowchart TB
     User <-->|read results| Report
 ```
 
-图中除现有测试服务和基础证据外，**Intake、Runner、Tool Registry、Projection、Report、Trace、Evaluator 均为目标设计**。后端模块可初期位于同一 Python 进程；无需人为拆微服务。`DBInspect` 是后续可选只读诊断，不预先假定数据库权限已配置。
+图中的 **Tool Registry、Projection** 已在 S1 以最小形式实现；**Intake、Runner、Report、Trace、Evaluator 仍为目标设计**。Logs 目前是有界应用事件视图，不是通用日志查询。Dep 只实现固定健康检查，未实现关联 receipt 工具。后端模块可初期位于同一 Python 进程；无需人为拆微服务。`DBInspect` 是后续可选只读诊断，不预先假定数据库权限已配置。
 
-### 3.1 核心契约（待实现）
+### 3.1 核心契约（S1 工具已落地，其余待实现）
 
 - `IncidentInput`：`incident_id`（生成）、时间窗口、受影响服务/接口、症状描述、可选相关 request ID；**禁止** `scenario_id`、预期根因和测试注入参数作为可见输入。
 - `ToolCall`：工具名、结构化参数、步骤 ID。只允许工具注册表中声明的只读工具；校验参数及查询范围后执行。任何模型生成的 Shell 命令或任意 SQL 均不得直接执行。
 - `ToolResult`：状态 `ok|error|unavailable`、观察值、时间范围、`evidence_id`、来源、截断标志、耗时、明确的未知字段。内部错误不要直接泄露敏感配置。
 - `InvestigationStep`：步骤序号、当前假设摘要、所选工具/入参、执行结果 ID、耗时/Token（可得时）、错误/拒绝/停止原因。
 - `InvestigationReport`：`status`（`supported|inconclusive|failed`）、可能根因、所依据证据 ID、仍未排除的假设、下一步人工检查建议、局限。**置信度如果加入，必须表明其不是校准概率。**
-- 以上为**候选领域契约**，具体字段类型需在首个开发 Task 中审查冻结；不要把建议命名冒充现有 API。
+- `ToolCall/ToolResult` 的已实现字段以 2.1 和代码为准；步骤 ID 属于后续 Runner 映射，S1 使用 call ID。`IncidentInput/InvestigationStep/InvestigationReport` 仍为**候选领域契约**，尚无对应 API，不由本次冻结。
 
 ### 3.2 调查执行序列
 
@@ -106,7 +142,7 @@ sequenceDiagram
 
 ## 5. 安全隔离与测试可信度
 
-1. **答案边界**：测试 controller 和 ground-truth 文件不可通过 Agent tool/API 访问；`scenario_id`、故障注入开关、预期答案不得混入 ToolResult 和 prompt。现有 [app/evidence.py](../app/evidence.py) 的 `scenario_id` 允许在 Lab 内部存在，但未来工具返回必须显式做 projection / allowlist，而不是原样转发记录。
+1. **答案边界**：测试 controller 和 ground-truth 文件不可通过 Agent tool/API 访问；`scenario_id`、故障注入开关、预期答案不得混入 ToolResult 和 prompt。现有 [app/evidence.py](../app/evidence.py) 的 `scenario_id` 允许在 Lab 内部存在；S1 工具返回已显式做 projection / allowlist，泄漏测试覆盖顶层、嵌套及控制路径。未来 Runner 必须只使用此类安全视图，不能绕过它读取原始记录。
 2. **保留真实线索**：运行时错误类型（如 DB_POOL_TIMEOUT）、请求 ID、DB pool 状态可以出现；该类型并不自动等于上游根因。不要人为隐藏正常工程师可取得的线索来提升难度。
 3. **只读最小权限**：禁止写 DB/故障控制端点；数据库状态工具使用受限查询模板、超时、行数限制；不开放任意 SQL；Lab 注入端点只供测试控制器。
 4. **内容可信度**：日志是数据而不是指令。工具返回可能包含恶意/混淆文本，应界定 prompt-injection 信任边界，输出不得作为执行权限提升依据。
@@ -120,10 +156,10 @@ sequenceDiagram
 | Python/FastAPI/SQLAlchemy/PostgreSQL/httpx/Docker | 已在 Fault Lab 使用，尽量复用 |
 | 目标：适应性多步取证，Agent 只读 | Owner 已确认的项目方向 |
 | 模型提供方和 SDK / LangGraph 等框架 | 未决；先选择最薄、可解释的实现方案 |
-| 工具数量和 DB 只读诊断范围 | 未决；首个 vertical slice 选择有限工具 |
+| S1 工具数量和 DB 诊断范围 | 已批准并实现三个工具；DB 仅本进程 pool，无 SQL 状态查询；后续扩展未决 |
 | Incident/Run 状态落库、Worker/Queue | 未决；不作为首版硬前置 |
 | SSE、Redis、MCP、多 Agent、前端 | 后续按需，不默认加入 |
-| 总步数、时间预算、输出 schema | 首次开发 Task 提案并经 Owner review |
+| 工具时间预算和输出 schema | S1 已批准并实现；Agent 总步数/调查预算/报告 schema 仍未决 |
 
 ## 7. 代码与文档责任
 

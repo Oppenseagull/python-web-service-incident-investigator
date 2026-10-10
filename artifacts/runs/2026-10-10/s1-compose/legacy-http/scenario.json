@@ -1,0 +1,113 @@
+[
+  {
+    "schema_version": 1,
+    "source": "reproduction",
+    "event_type": "scenario_observation",
+    "incident_id": "c0be0238b7874722a479335f5f22169a",
+    "scenario_id": "downstream-http-timeout",
+    "request_id": "5523869a30254a9ca714019e77436704",
+    "timestamp": "2026-10-10T07:10:10.034615Z",
+    "service": "investigator-app",
+    "dependency": "controlled-http",
+    "error_type": null,
+    "latency_ms": 3.8674580000019887,
+    "observations": {
+      "phase": "normal",
+      "status_code": 200,
+      "body": {
+        "value": "ready"
+      },
+      "db_pool": {
+        "configured_pool_size": 2,
+        "configured_max_overflow": 0,
+        "pool_timeout_seconds": 1.0,
+        "checked_out": 0,
+        "checked_in": 0,
+        "overflow": -2
+      },
+      "downstream_state": {
+        "fault_active": false,
+        "delay_seconds": 0.0,
+        "remaining_seconds": 0.0,
+        "active_requests": 0,
+        "last_request_id": "5523869a30254a9ca714019e77436704",
+        "last_received_at": "2026-10-10T07:10:10.030650+00:00"
+      }
+    }
+  },
+  {
+    "schema_version": 1,
+    "source": "reproduction",
+    "event_type": "scenario_observation",
+    "incident_id": "c0be0238b7874722a479335f5f22169a",
+    "scenario_id": "downstream-http-timeout",
+    "request_id": "49cd2602c9204670afd3809a88ac4ef9",
+    "timestamp": "2026-10-10T07:10:11.045255Z",
+    "service": "investigator-app",
+    "dependency": "controlled-http",
+    "error_type": "DOWNSTREAM_HTTP_TIMEOUT",
+    "latency_ms": 1005.1707199999953,
+    "observations": {
+      "phase": "fault",
+      "status_code": 504,
+      "body": {
+        "error": {
+          "code": "DOWNSTREAM_HTTP_TIMEOUT",
+          "message": "Downstream response exceeded read timeout"
+        }
+      },
+      "db_pool": {
+        "configured_pool_size": 2,
+        "configured_max_overflow": 0,
+        "pool_timeout_seconds": 1.0,
+        "checked_out": 0,
+        "checked_in": 0,
+        "overflow": -2
+      },
+      "downstream_state": {
+        "fault_active": true,
+        "delay_seconds": 3.0,
+        "remaining_seconds": 8.991,
+        "active_requests": 1,
+        "last_request_id": "49cd2602c9204670afd3809a88ac4ef9",
+        "last_received_at": "2026-10-10T07:10:10.038851+00:00"
+      }
+    }
+  },
+  {
+    "schema_version": 1,
+    "source": "reproduction",
+    "event_type": "scenario_observation",
+    "incident_id": "c0be0238b7874722a479335f5f22169a",
+    "scenario_id": "downstream-http-timeout",
+    "request_id": "e6882e940afd45188c97c1d7ab63a5c9",
+    "timestamp": "2026-10-10T07:10:13.062334Z",
+    "service": "investigator-app",
+    "dependency": "controlled-http",
+    "error_type": null,
+    "latency_ms": 6.376579999994192,
+    "observations": {
+      "phase": "recovered",
+      "status_code": 200,
+      "body": {
+        "value": "ready"
+      },
+      "db_pool": {
+        "configured_pool_size": 2,
+        "configured_max_overflow": 0,
+        "pool_timeout_seconds": 1.0,
+        "checked_out": 0,
+        "checked_in": 0,
+        "overflow": -2
+      },
+      "downstream_state": {
+        "fault_active": false,
+        "delay_seconds": 0.0,
+        "remaining_seconds": 0.0,
+        "active_requests": 0,
+        "last_request_id": "e6882e940afd45188c97c1d7ab63a5c9",
+        "last_received_at": "2026-10-10T07:10:13.056548+00:00"
+      }
+    }
+  }
+]

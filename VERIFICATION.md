@@ -1,4 +1,44 @@
-# M0 verification
+# Verification
+
+## S1 safe investigator tools — 2026-10-10
+
+Owner authorized implementation after reviewing the proposed minimal plan;
+their independent G0/M1 learning review is still pending. S1 is implemented and
+verified, awaiting Owner Review. M0 remains Completed; S2 has not started.
+
+- Native: `.\.venv\Scripts\python -m pytest -q -s -m 'not integration'`:
+  **43 passed, 2 deselected in 11.47s**. Includes 34 new contract/isolation cases,
+  original lightweight/real HTTP tests and the new same-process Registry + real
+  TCP timeout/recovery test. The two real DB tests were deselected, not passed.
+- After successful `docker compose up --build --wait`, full suite:
+  `docker compose exec -T -e RUN_INTEGRATION=1 -e S1_RUN_DIR=/tmp/s1-tools -e LAB_RUN_DIR=/tmp/s1-legacy-http app python -m pytest -q -s`:
+  **45 passed in 20.68s**, including all nine original tests and both new real
+  tool fault integrations. No mock supplies the core HTTP or DB failure.
+- Safe HTTP tool evidence: **200 → 504 → 200**, application fault latency
+  **1004.30ms**, ReadTimeout, dependency `controlled-http`, request ID
+  `8c554a346d0740af808605828159f8fa`, evidence ID
+  `e2247acc5bea4de69fae04e108722fe9`. Fixed health probe returned 200;
+  HTTP-only app pool stayed unopened, with zero checked-out connections.
+- Safe DB tool evidence: **200 → 503 → 200**, fault latency **1004.07ms**,
+  `DB_POOL_TIMEOUT`, request ID `0db15b631c0b4ee1be671c9e2c47e560`, evidence ID
+  `f2277cbd0a004fbbbf9e7ffa8eb7ca9a`. Timeout event retains the historical pool
+  snapshot 2 checked out / 0 in; current tool snapshot after recovery is 0/2.
+- Tests cover closed parameters/windows/limits, forged preconstructed models,
+  top-level and nested answer/control fields, all lab/control routes, stable IDs,
+  no data/nulls, capacity/expiry/concurrent writes, redirects/response size,
+  unreachable/timeout/internal errors, output validation and hard async timeout.
+  Real integration checks query by actual response request ID and compare safe
+  evidence to the observed status; controller labels are not tool inputs.
+- Docker initially lacked its engine pipe and the backend log showed an
+  inaccessible runtime socket. Attempts to inspect/delete it did not complete;
+  cleanup was blocked by automatic policy. Starting the actual per-user
+  `Docker Desktop.exe` succeeded, with engine 29.7.2. No socket removal, global
+  configuration change or DB volume reset was needed. Build used unchanged
+  cached dependencies and fresh source layers; 23 source/dependency hashes match.
+
+[S1 commands, raw output, safe exports and source identity](artifacts/runs/2026-10-10/README.md).
+These are deterministic tool and real fault integration results, **not Agent Eval**.
+Existing M0/M1 evidence below remains unchanged.
 
 ## M1 Task 1 verification — 2026-10-09
 

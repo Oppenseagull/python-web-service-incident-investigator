@@ -1,0 +1,105 @@
+ Image job-app Building
+ Image job-downstream Building
+#1 [internal] load local bake definitions
+#1 reading from stdin 835B 0.0s done
+#1 DONE 0.0s
+
+#2 [app internal] load build definition from Dockerfile
+#2 transferring dockerfile: 478B 0.0s done
+#2 DONE 0.0s
+
+#3 [downstream internal] load metadata for docker.io/library/python:3.12-slim
+#3 DONE 2.6s
+
+#4 [app internal] load .dockerignore
+#4 transferring context: 97B 0.0s done
+#4 DONE 0.0s
+
+#5 [downstream 1/9] FROM docker.io/library/python:3.12-slim@sha256:a6e34c598f2467ed0e9a8d349809fcd8b5c603269512df273a0bb1784edc11b1
+#5 resolve docker.io/library/python:3.12-slim@sha256:a6e34c598f2467ed0e9a8d349809fcd8b5c603269512df273a0bb1784edc11b1 0.0s done
+#5 DONE 0.0s
+
+#6 [app internal] load build context
+#6 transferring context: 217.88kB 0.0s done
+#6 DONE 0.0s
+
+#7 [downstream 2/9] WORKDIR /service
+#7 CACHED
+
+#8 [downstream 3/9] COPY requirements.lock ./
+#8 CACHED
+
+#9 [downstream 4/9] RUN pip install --no-cache-dir -r requirements.lock
+#9 CACHED
+
+#10 [downstream 5/9] COPY app ./app
+#10 DONE 0.0s
+
+#10 [app 5/9] COPY app ./app
+#10 DONE 0.0s
+
+#11 [app 6/9] COPY downstream ./downstream
+#11 DONE 0.0s
+
+#12 [downstream 7/9] COPY scripts ./scripts
+#12 DONE 0.0s
+
+#13 [app 8/9] COPY tests ./tests
+#13 DONE 0.0s
+
+#13 [downstream 8/9] COPY tests ./tests
+#13 DONE 0.0s
+
+#14 [app 9/9] COPY pyproject.toml ./
+#14 DONE 0.0s
+
+#15 [app] exporting to image
+#15 exporting layers
+#15 exporting layers 0.3s done
+#15 exporting manifest sha256:53edefa64b0994b03776b1a4cf9a2af55b0a460baf0b1a7823e7231ec7b10fff 0.0s done
+#15 exporting config sha256:b6447275e150cc84e90ca50ea20568e8f4edc01dc73a369e01ab2bb90c68cc04 0.0s done
+#15 exporting attestation manifest sha256:c5be9573a2a06b6b07a4256ef23a544904b137d82e46e10730b8d46eb0013617
+#15 exporting attestation manifest sha256:c5be9573a2a06b6b07a4256ef23a544904b137d82e46e10730b8d46eb0013617 0.0s done
+#15 exporting manifest list sha256:474201f6d00f08e1e39568f60778ee7149fbb12ecee71994ecbe17f3e1674b03 0.0s done
+#15 naming to docker.io/library/job-app:latest done
+#15 unpacking to docker.io/library/job-app:latest
+#15 unpacking to docker.io/library/job-app:latest 0.1s done
+#15 DONE 0.5s
+
+#16 [downstream] exporting to image
+#16 exporting layers 0.3s done
+#16 exporting manifest sha256:138701df2bb8a5beac09309827046f48e5f1344c67c31e65c2115661cd39d3c7 0.0s done
+#16 exporting config sha256:dd55c878ff65bce8d69310744c3e831addf73d3f94405d0fe862c545a89f1b12 0.0s done
+#16 exporting attestation manifest sha256:aa814b815acba827d39924e67c3b9ef1a97388eaaffe5262ec071cb0aef7e39b 0.0s done
+#16 exporting manifest list sha256:0aeab61fa3601d49f8b632c56241fcfbaabb23073b140d9b8ede782fdb3f7d0f 0.0s done
+#16 naming to docker.io/library/job-downstream:latest done
+#16 unpacking to docker.io/library/job-downstream:latest 0.1s done
+#16 DONE 0.5s
+
+#17 [downstream] resolving provenance for metadata file
+#17 DONE 0.0s
+
+#18 [app] resolving provenance for metadata file
+#18 DONE 0.0s
+ Image job-downstream Built
+ Image job-app Built
+ Container job-downstream-1 Recreate
+ Container job-downstream-1 Recreated
+ Container job-app-1 Recreate
+ Container job-app-1 Recreated
+ Container job-postgres-1 Starting
+ Container job-downstream-1 Starting
+ Container job-postgres-1 Started
+ Container job-downstream-1 Started
+ Container job-postgres-1 Waiting
+ Container job-downstream-1 Waiting
+ Container job-postgres-1 Healthy
+ Container job-downstream-1 Healthy
+ Container job-app-1 Starting
+ Container job-app-1 Started
+ Container job-postgres-1 Waiting
+ Container job-app-1 Waiting
+ Container job-downstream-1 Waiting
+ Container job-postgres-1 Healthy
+ Container job-downstream-1 Healthy
+ Container job-app-1 Healthy

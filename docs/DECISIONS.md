@@ -203,3 +203,39 @@ is still unmeasured; historical implementation and verification facts remain unc
 - Cost: The first slice proves execution, not comparative diagnostic gain.
   Framework, model, storage, budgets, Eval design and additional infrastructure
   remain unfrozen. No new project selection or parallel Project B is started.
+
+## 2026-10-10 — S1 closed read-only tools and safe evidence projection
+
+- Context: Raw Evidence v1 and lab diagnostics contain scenario/control metadata;
+  S2 needs actual observations without receiving the test answer.
+- Decision: Owner approved three Python tools: bounded application-event query,
+  connection-free application pool snapshot, and fixed downstream `/healthz`
+  probe. Use existing Pydantic/httpx; closed schemas, nested field allowlists,
+  approved paths/enums, no raw text/exports, no redirects or caller URLs. Exclude
+  all lab request events, scenario/run IDs and injector metadata before caching.
+- Reason: A small, executable boundary can be tested with the two real faults
+  while preserving useful error classes, timing, correlation and pool evidence.
+- Cost: Health checks show current liveness only. No downstream receipt tool,
+  DB server activity queries, historical file ingestion or arbitrary data access.
+  This is an interface/data boundary, not independent process/container or
+  production permission isolation. Existing privileged lab interfaces still exist.
+- Authority: Owner explicitly approved the proposed S1 plan in this session;
+  this approval does not certify their independent M1 learning review.
+
+## 2026-10-10 — S1 bounded memory, citations and execution limits
+
+- Context: Standard logs cannot currently be queried through a safe tool, and
+  adding a storage platform would delay the first investigation slice.
+- Decision: Capture the actual middleware Evidence through projection into a
+  process-local store, capacity 2,000 observations, 600s monotonic retention,
+  FIFO eviction, locked bounded operations with no IO under the lock. Store safe
+  request events and tool snapshots; observation UUIDs remain stable while retained.
+  Query by request ID and/or aware window <=300s, max 50 results. Report truncation,
+  nulls, missing/unavailable/error states. Use a 2s async execution deadline,
+  1s probe IO timeout, 4 KiB health response limit and sanitized error codes.
+- Reason: Stable citations and bounded reads support S2 without a new dependency,
+  persistence schema, public API or plugin architecture.
+- Cost: Restart/eviction loses evidence; each process owns its store and pool.
+  A returned record can expire before later lookup. Async deadlines cannot stop
+  event-loop blocking code. Unknown lookup is `None`, not a fabricated observation.
+  Agent/Eval/model/storage/queue decisions remain outside S1.

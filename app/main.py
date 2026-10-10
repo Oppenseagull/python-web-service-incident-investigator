@@ -21,6 +21,8 @@ from app.config import Settings
 from app.database import create_engine, get_session
 from app.downstream import lab_router, router
 from app.evidence import Evidence
+from app.investigator.evidence import SafeEvidenceStore
+from app.investigator.tools import ToolRegistry
 
 logger = logging.getLogger("fault_lab")
 Session = Annotated[AsyncSession, Depends(get_session)]
@@ -42,6 +44,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 timeout=httpx.Timeout(2, read=settings.downstream_read_timeout),
             ) as client:
                 app.state.http_client = client
+                app.state.investigator_tools = ToolRegistry(
+                    app.state.safe_evidence, pool_snapshot, client, settings.downstream_read_timeout,
+                )
                 yield
         finally:
             await engine.dispose()
@@ -49,6 +54,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app = FastAPI(title="Incident Fault Lab", lifespan=lifespan)
     app.state.settings = settings
     app.state.sessions = async_sessionmaker(engine, expire_on_commit=False)
+    app.state.safe_evidence = SafeEvidenceStore()
     app.include_router(router)
 
     def pool_snapshot() -> dict[str, int | float]:
@@ -83,7 +89,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 request.url.path, status, request.state.request_id,
                 latency_ms,
             )
-            logger.info("evidence=%s", Evidence(
+            evidence = Evidence(
                 source="application", event_type="http_request",
                 request_id=request.state.request_id,
                 scenario_id=request.state.scenario_id,
@@ -92,7 +98,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 latency_ms=latency_ms,
                 observations={"path": request.url.path, "status_code": status,
                               **request.state.observations},
-            ).model_dump_json())
+            )
+            logger.info("evidence=%s", evidence.model_dump_json())
+            app.state.safe_evidence.capture(evidence)
 
     @app.exception_handler(SQLAlchemyTimeoutError)
     async def pool_timeout(request: Request, exc: SQLAlchemyTimeoutError) -> JSONResponse:

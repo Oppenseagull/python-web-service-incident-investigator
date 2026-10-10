@@ -1,19 +1,71 @@
 # Current project state
 
-Updated: 2026-10-10 (documentation-only direction sync). This file is the authoritative progress checkpoint for
+Updated: 2026-10-10 (S1 implementation and verification). This file is the authoritative progress checkpoint for
 subsequent work on Python Web Service Incident Investigator / Project A.
 
 Owner-confirmed product definition and future priorities:
 [PROJECT_DIRECTION.md](PROJECT_DIRECTION.md). Design intent is separate from
 the implemented capabilities and retained verification results below.
 
-## Current milestone: M1 / Task 1 implemented — awaiting Owner review
+## Current milestone: S1 implemented and verified — awaiting Owner review
 
 M0 remains **Completed**. M1 Task 1 adds a second real fault, six-case catalog,
 and an evidence foundation under the Owner's explicit development instruction.
 This first increment is implemented and verified, then stopped for review.
 Overall Project A and the rest of M1 are **not complete**. Personal learning
 checks do not change completed technical milestone status.
+
+S1 was explicitly authorized after the Owner approved the implementation plan.
+It adds safe Python investigation tools; it does not mark M1 Task 1 Owner Review
+as passed. M1 Task 1 remains awaiting Owner review. **S2 has not started.**
+
+## S1 implemented capabilities and new evidence
+
+- `Validated ToolCall → ToolRegistry → safe evidence access → ToolResult`, using
+  closed Pydantic schemas; no LLM, investigation API or diagnosis report.
+- Three tools: recent application events, instantaneous application DB pool
+  snapshot without acquiring a connection, fixed downstream `/healthz` probe.
+- Explicit nested allowlist projection before storage: application request data
+  only, approved business paths, bounded numeric/enum observations. No controller
+  exports, scenario/run IDs, injector state, raw exception text, arbitrary URLs,
+  SQL, shell or filesystem access. All `/lab/*` request events are excluded.
+- Up to 2,000 projected observations retained for 600 seconds, with monotonic
+  expiry, FIFO capacity eviction and short locked memory operations. Single-process,
+  non-durable; restart loses records, no historical log ingestion or shared cache.
+- Each retained observation has a stable `evidence_id`; repeated queries and
+  `get_evidence(id)` resolve the same safe record. New snapshots get new IDs.
+  Evicted/expired/unknown lookup returns `None`; tool no-data results are structured
+  `unavailable`. Unknown values remain null; measured zero is preserved.
+- Event query: request ID and/or timezone-aware window of at most 300 seconds,
+  1–50 results; truncation and possible incomplete retained history are disclosed.
+- Registry execution budget: 2s cooperative async deadline; downstream probe IO
+  timeout 1s, response cap 4 KiB, no redirects or caller-provided URL. Health means
+  current liveness, not historical `/value` readiness or proof of a root cause.
+- Native final suite: **43 passed, 2 deselected in 11.47s**. Full freshly built
+  Compose suite: **45 passed in 20.68s**, including all nine original cases.
+- Tool-visible HTTP evidence: **200 → 504 (1004.30ms) → 200**, actual ReadTimeout;
+  DB evidence: **200 → 503 (1004.07ms) → 200**, historical timeout pool 2/0,
+  recovered live pool 0/2. Both include request/evidence IDs, safe provenance and
+  control-data exclusion. These are tool/integration tests, not Agent Eval.
+- [S1 run index, commands, safe exports and source manifest](../artifacts/runs/2026-10-10/README.md).
+  All 23 Python/dependency files match the tested container after LF normalization.
+
+S1 entry points: [contracts](../app/investigator/contracts.py),
+[projection/store](../app/investigator/evidence.py), [registry](../app/investigator/tools.py),
+[unit tests](../tests/test_investigator_tools.py),
+[real HTTP/DB tests](../tests/test_investigator_integration.py).
+Registry is available as `app.state.investigator_tools` during the app lifespan,
+in the same process as the observed app. A separate Python process cannot read it.
+
+G0 engineering check found no code/evidence contradiction; prior faults and cleanup
+are confirmed by the new regression. Owner learning review is still pending:
+Session versus connection, read versus connect timeout, client timeout versus
+downstream work cancellation, and operational evidence versus controller answers.
+This records implementation approval, not successful independent Owner explanation.
+
+The sections below retain the M0/M1 baseline and original evidence. References
+there to unimplemented tools/ingestion describe that earlier milestone; S1's
+bounded safe view above supersedes them. Raw Evidence v1 logs/exports are unchanged.
 
 ## Implemented capabilities
 
@@ -153,7 +205,7 @@ from active code and historical M0 evidence in `VERIFICATION.md`.
 ## System capabilities not yet implemented
 
 Agent/LLM integration, incident diagnosis, Incident Persistence, a general
-Eval Runner, four Proposed fault scenarios, automatic evidence ingestion/correlation,
+Eval Runner, four Proposed fault scenarios, durable/cross-process evidence collection,
 workers/queues, distributed tracing/metrics infrastructure, and a frontend
 are not implemented. The M0 scenario script is not a general evaluation system.
 
@@ -166,12 +218,12 @@ Fault Lab is the development/evaluation environment. Case count is not a
 measure of investigation quality. These choices supersede the earlier next-step
 suggestion; they do not change M0 Completed or M1 Task 1 awaiting Owner review.
 
-1. Await Owner Review of M1 Task 1 and this direction synchronization. This
-   task authorizes documents only; no Agent development begins automatically.
-2. Design a controlled read-only Tool Contract and isolate Ground Truth,
-   scenario labels and injector/controller metadata from visible evidence.
-   Existing exports are not yet a safe blind-investigation tool interface.
-3. Prioritize an **Investigation Vertical Slice** reusing the two real faults:
+1. Await Owner Review of S1 and the still-unconfirmed M1 Task 1 learning review.
+   S1 is implemented and verified; its approval does not automatically authorize S2.
+2. S1 supplies controlled tools and an explicitly projected safe view. Review the
+   schemas, leak tests, real fault evidence and process-local retention limits.
+   Controller exports remain privileged and are never tool inputs.
+3. After separate authorization, prioritize an **Investigation Vertical Slice** reusing the two real faults:
    label-free incident → LLM chooses tool → backend validates and executes →
    LLM continues or stops → report cites evidence and retains uncertainty.
    This will first prove the engineering loop, not superiority over rules.
@@ -189,13 +241,13 @@ case; comparative benefit remains unmeasured. The earlier limitation about
 simple rules distinguishing today's faults is still technically valid and no
 longer acts as a gate against the confirmed investigation product direction.
 
-Open decisions: LLM/model/SDK/framework, input/report/tool schemas, visible
-evidence projection and leakage checks, context/state/budgets/stop policy,
+Open decisions: LLM/model/SDK/framework, incident/report schemas, expanded tool
+scopes and stronger isolation, investigation context/state/budgets/stop policy,
 baseline/Eval cases/scoring, and when to add storage or other infrastructure.
 Agent investigation, general Eval Runner, persistence and the four Proposed
 faults remain **not implemented**.
 
-No runtime/test/dependency/configuration change or new test run occurred in
-this direction sync. Historical test results above are unchanged. Project
-Master Context is unchanged; no new project selection or parallel Project B
-starts. Wait for Owner Review and a separate development instruction.
+Historical M0/M1 results above are unchanged. S1 adds only the tool layer,
+request capture integration and necessary tests/documentation. Dependencies,
+runtime configuration, fault injectors and Project Master Context are unchanged.
+No parallel Project B or S2 development starts. Wait for Owner Review.
