@@ -1,10 +1,13 @@
-# M0 engineering decisions
+# Project A engineering decisions
 
 Archived: 2026-10-09. These decisions describe the implemented M0 baseline.
 They do not freeze M1 architecture or claim later system capabilities.
 
 M0 decisions below are retained as their milestone baseline. The subsequent
 M1 Task 1 decisions at the end extend that baseline under Owner authorization.
+The 2026-10-10 direction update below supersedes the earlier proposed next-step
+ordering and resolves the product-level Agent direction. Comparative benefit
+is still unmeasured; historical implementation and verification facts remain unchanged.
 
 ## 1. Controlled Python web service fault lab
 
@@ -139,3 +142,64 @@ M1 Task 1 decisions at the end extend that baseline under Owner authorization.
   ambiguity with ground truth hidden.
 - Cost: The current two cases can be distinguished with simple rules. Agent
   necessity, persistence and general evaluation architecture remain undecided.
+
+## 2026-10-10 — Adaptive Root-Cause Investigation direction
+
+- Context: M0 and M1 Task 1 establish reproducible faults and observations.
+  Their two explicit error classes are easy to distinguish; treating that as
+  the final product would reduce investigation to a fixed fault classifier.
+- Decision: Keep Incident Investigator as Project A. Target backend/on-call
+  engineers investigating symptoms with an unknown root cause through dynamic,
+  multi-step, controlled read-only evidence gathering. Reports cite evidence,
+  retain unresolved hypotheses, admit insufficient evidence, and suggest human
+  next steps. First version performs no production remediation.
+- Reason: Investigation quality depends on hypothesis revision and selecting
+  useful next observations, not the number of catalog labels.
+- Cost: The Agent investigation is a confirmed product target, not yet built.
+  Root-cause claims need evidence; the existing lab cannot demonstrate Agent
+  benefit or production generalization. Model and implementation choices remain open.
+- Authority: Owner-provided [dated handoff](handoffs/2026-10-10/PROJECT_A_DIRECTION_HANDOFF_20261010.md),
+  consolidated in [PROJECT_DIRECTION.md](PROJECT_DIRECTION.md).
+
+## 2026-10-10 — Agent reasoning and deterministic execution
+
+- Context: Adaptive investigation requires discretionary next-step choices
+  while tool execution and service constraints must remain reliable.
+- Decision: Agent forms/revises hypotheses, chooses tools, analyzes evidence,
+  and decides whether to continue/stop/request confirmation. Deterministic
+  code owns permissions, schemas, tool execution, validation, state, timeouts,
+  budgets, retry policy, correlation and any future persistence.
+- Reason: Explicit programmatic boundaries make tool calling inspectable and
+  testable without relying on the model to enforce its own permissions.
+- Cost: Tool and report contracts, context/state design and failure handling
+  still require development. This decision adds no framework or runtime component.
+
+## 2026-10-10 — Ground Truth separation and honest Eval
+
+- Context: Scenario IDs, injector state and controller exports can expose the
+  answer. Distinguishing known lab faults is not a blind investigation evaluation.
+- Decision: Fault Lab/Controller retains injection, labels and hidden Ground
+  Truth; Investigator sees only reasonably observable, authorized evidence.
+  Exclude answer-revealing metadata from blind context. Real error classes may
+  remain operational clues but do not establish the upstream root cause.
+  Establish repeatable fixed/rule baseline versus multi-step Agent Eval later;
+  do not require Agent superiority in every scenario or assert benefit in advance.
+- Reason: Evaluate root-cause/evidence quality, unsupported claims, redundant
+  or ineffective tools, latency/cost and difficult cases with faithful provenance.
+- Cost: Evidence projection, leakage checks and general Eval Runner are unbuilt.
+  Synthetic case suites are development/regression tests, not production-scale
+  generalization evidence. Existing schema and nine tests are retained as lab work.
+
+## 2026-10-10 — Investigation Vertical Slice before catalog expansion
+
+- Context: Mechanically implementing all six candidates postpones testing the
+  core investigation loop. Four Proposed cases are a design reserve, not a gate.
+- Decision: After Owner review, prioritize a label-free incident → LLM tool
+  choice → backend validation/execution → further evidence or stop → cited report
+  vertical slice using the two existing faults. Follow with selected causal
+  confounders and hidden-answer Eval rather than completing a fixed six-class list.
+- Reason: First prove a working investigation loop, then evaluate and improve
+  it using measured evidence; do not make universal superiority over rules a prerequisite.
+- Cost: The first slice proves execution, not comparative diagnostic gain.
+  Framework, model, storage, budgets, Eval design and additional infrastructure
+  remain unfrozen. No new project selection or parallel Project B is started.

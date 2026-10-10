@@ -7,6 +7,12 @@ persistence service, or monitoring stack is implemented.
 
 ## Project index / current checkpoint
 
+- [Owner-confirmed project direction](docs/PROJECT_DIRECTION.md) (2026-10-10):
+  **Adaptive Root-Cause Investigation** from unknown-root-cause symptoms through
+  controlled read-only tools to evidence-cited reports. Fault Lab is the
+  development/evaluation environment. Next priority is an Investigation
+  Vertical Slice, not completing six fixed fault classes. The Agent, blind
+  evidence projection and general Eval Runner are future work, not implemented.
 - Current milestone: **M1 Task 1 implemented, awaiting Owner review**;
   **M0 Completed** remains the baseline. See the authoritative
   [current state](docs/CURRENT_STATE.md), [M0 decisions](docs/DECISIONS.md),

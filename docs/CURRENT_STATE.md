@@ -1,7 +1,11 @@
 # Current project state
 
-Updated: 2026-10-09. This file is the authoritative progress checkpoint for
+Updated: 2026-10-10 (documentation-only direction sync). This file is the authoritative progress checkpoint for
 subsequent work on Python Web Service Incident Investigator / Project A.
+
+Owner-confirmed product definition and future priorities:
+[PROJECT_DIRECTION.md](PROJECT_DIRECTION.md). Design intent is separate from
+the implemented capabilities and retained verification results below.
 
 ## Current milestone: M1 / Task 1 implemented — awaiting Owner review
 
@@ -153,11 +157,45 @@ Eval Runner, four Proposed fault scenarios, automatic evidence ingestion/correla
 workers/queues, distributed tracing/metrics infrastructure, and a frontend
 are not implemented. The M0 scenario script is not a general evaluation system.
 
-## Questions for the next phase
+## Next priorities — Owner-confirmed direction, not implemented
 
-Await Owner review. Suggested next increment: separate ground-truth/controller
-metadata from diagnosis-visible evidence, and define a small deterministic
-diagnosis baseline for the implemented cases plus ambiguous/incomplete evidence.
-PostgreSQL lock wait is a useful later confounder, not approved for development
-here. Persistence, evaluation architecture and Agent remain undecided.
-Project Master Context is unchanged.
+2026-10-10 strategic review retains Incident Investigator and confirms
+**Adaptive Root-Cause Investigation** as the product task: unknown-root-cause
+symptoms → dynamic read-only evidence gathering → an evidence-supported report.
+Fault Lab is the development/evaluation environment. Case count is not a
+measure of investigation quality. These choices supersede the earlier next-step
+suggestion; they do not change M0 Completed or M1 Task 1 awaiting Owner review.
+
+1. Await Owner Review of M1 Task 1 and this direction synchronization. This
+   task authorizes documents only; no Agent development begins automatically.
+2. Design a controlled read-only Tool Contract and isolate Ground Truth,
+   scenario labels and injector/controller metadata from visible evidence.
+   Existing exports are not yet a safe blind-investigation tool interface.
+3. Prioritize an **Investigation Vertical Slice** reusing the two real faults:
+   label-free incident → LLM chooses tool → backend validates and executes →
+   LLM continues or stops → report cites evidence and retains uncertainty.
+   This will first prove the engineering loop, not superiority over rules.
+4. Then select a few causal/confounding cases and build a repeatable hidden-answer
+   Eval Suite with fixed/rule baselines. Measure diagnosis/evidence quality,
+   unsupported assertions, ineffective/repeated tools, latency/cost and difficult
+   cases. Do not mechanically implement all six candidates as the next priority.
+5. Introduce persistence/background tasks/further reliability mechanisms only
+   when justified by experiments; no such implementation is present today.
+
+Agent responsibilities are hypothesis revision, tool choice, evidence analysis
+and stop decisions. Deterministic code owns execution, permissions, validation,
+state, timeouts/budgets, retry policy and correlation. Agent need not win every
+case; comparative benefit remains unmeasured. The earlier limitation about
+simple rules distinguishing today's faults is still technically valid and no
+longer acts as a gate against the confirmed investigation product direction.
+
+Open decisions: LLM/model/SDK/framework, input/report/tool schemas, visible
+evidence projection and leakage checks, context/state/budgets/stop policy,
+baseline/Eval cases/scoring, and when to add storage or other infrastructure.
+Agent investigation, general Eval Runner, persistence and the four Proposed
+faults remain **not implemented**.
+
+No runtime/test/dependency/configuration change or new test run occurred in
+this direction sync. Historical test results above are unchanged. Project
+Master Context is unchanged; no new project selection or parallel Project B
+starts. Wait for Owner Review and a separate development instruction.
